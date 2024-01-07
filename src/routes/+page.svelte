@@ -1,21 +1,33 @@
 <script lang="ts">
-	import type { ActionData, PageData } from "./$types";
+	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
+	import type { ActionData, PageData } from './$types';
 
-    export let data: PageData;
-    export let form: ActionData;
+	export let data: PageData;
+	export let form: ActionData;
+
+	onMount(() =>  console.log('Page mount', form));
 </script>
 
-<div class="flex flex-col w-full items-center justify-center">
-    <a href="/login">Get Started</a>
-    {#if data.access_token}
-    <form method="post" action="?/viewFollowedArtists">
-        <button>View artists you follow</button>
-    </form>
-    {/if}
+<div class="flex flex-col h-full items-center justify-center bg-spotiblack">
+	{#if data.spotifyToken}
+		<form method="post" action="?/viewFollowedArtists">
+			<button class="text-white">View artists you follow </button>
+		</form>
+	{:else}
+		<!-- <a href="/api/login" class="text-white">Get Started</a> -->
+		<form method="post" action="?/authWithSpotify" use:enhance>
+			<button class="text-white">Get Started</button>
+		</form>
+	{/if}
 
-    {#if form?.artists}
-        {#each form.artists as artist}
-            <div>{artist}</div>
-        {/each}
-    {/if}
+	{#if form?.artists}
+		<div class="flex gap-4 flex-wrap p-4">
+			{#each form.artists as artist}
+				<div class="flex items-center justify-center p-4 bg-spotigreen rounded-lg text-white w-fit">
+					{artist.name}
+				</div>
+			{/each}
+		</div>
+	{/if}
 </div>
