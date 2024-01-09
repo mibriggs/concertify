@@ -4,7 +4,7 @@
 
 	export let data: PageData;
 
-	const chunkSize = 15;
+	const chunkSize = 12;
 	const chunks: Artist[][] = [];
 
 	if (data.artists) {
@@ -18,9 +18,9 @@
 </script>
 
 {#if data.artists}
-	<div class="flex-col text-white">
+	<main class="flex-col text-white">
 		<div class="flex justify-between pl-8 items-center">
-			<div>Artists you Follow</div>
+			<span>Artists you Follow</span>
 			<div class="flex gap-4 pr-6">
 				<button
 					class=" bg-slate-200 rounded-lg px-2 py-1 text-spotiblack disabled:bg-spotigreen disabled:text-white"
@@ -38,14 +38,16 @@
 				</button>
 			</div>
 		</div>
-		<div class="flex flex-wrap items-center justify-center lg:justify-start">
+		<div class="flex flex-wrap items-center justify-center m-8 md:justify-start">
 			{#each chunks[currIndex] as artist}
-				<div class="flex-col items-center justify-center p-4 text-start w-72">
-					<img src={artist.images[0].url} alt="Artist" class="w-72 h-auto" />
-					<div class=" text-2xl font-bold">{artist.name}</div>
-					<div class="flex text-sm text-wrap italic">Genres: {artist.genres.join(', ')}</div>
+				<div
+					class="flex-col items-center justify-center p-4 text-start w-72 bg-gray-400 rounded-xl m-6"
+				>
+					<img src={artist.images[0].url} alt="Artist" class="w-72 h-auto rounded-lg" />
+					<span class=" text-2xl font-bold pt-2">{artist.name}</span>
+					<span class="flex text-sm text-wrap italic">Genres: {artist.genres.join(', ')}</span>
 				</div>
 			{/each}
 		</div>
-	</div>
+	</main>
 {/if}
