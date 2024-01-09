@@ -5,18 +5,18 @@ export const accessTokenSuccessResponseSchema = z.object({
 	token_type: z.string(),
 	scope: z.string().optional(),
 	expires_in: z.number(),
-	refresh_token: z.string(),
+	refresh_token: z.string()
 });
 
 export const refreshTokenSuccessResponseSchema = z.object({
 	access_token: z.string(),
 	token_type: z.string(),
 	scope: z.string(),
-	expires_in: z.number(),
+	expires_in: z.number()
 });
 
 export const accessTokenSchema = accessTokenSuccessResponseSchema.extend({
-	createdAt: z.string().transform((val) => new Date(val)),
+	createdAt: z.string().transform((val) => new Date(val))
 });
 
 export const artistSchema = z.object({
@@ -40,7 +40,7 @@ export const artistSchema = z.object({
 	name: z.string(),
 	popularity: z.number(),
 	type: z.string(),
-	uri: z.string(),
+	uri: z.string()
 });
 
 export const followedArtistsSuccessReponseSchema = z.object({
@@ -74,6 +74,7 @@ export type SpotifyRedirectOptions = {
 	scope?: string;
 	redirect_uri: string;
 	state: string;
+	show_dialog?: boolean;
 };
 
 export type FollowedArtists = z.infer<typeof followedArtistsSuccessReponseSchema>;

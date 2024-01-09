@@ -1,0 +1,55 @@
+import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+import {
+	type AccessTokenWithDate,
+	type Artist,
+	type FollowedArtists,
+	followedArtistsSuccessReponseSchema
+} from '$lib/types';
+
+const getArtists = async (accessToken: AccessTokenWithDate): Promise<Artist[]> => {
+	let followedArtists: Artist[] = [];
+	let moreArtistsToDiscover: boolean = true;
+	let startingArtist: string = '';
+
+	while (moreArtistsToDiscover) {
+		const fetchUrl = `https://api.spotify.com/v1/me/following?type=artist&limit=50${
+			startingArtist !== '' ? '&after=' + startingArtist : ''
+		}`;
+		const response = await fetch(fetchUrl, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${accessToken.access_token}`
+			}
+		});
+
+		if (response.status === 200) {
+			const data = (await response.json()) as unknown;
+			const artistsData: FollowedArtists = followedArtistsSuccessReponseSchema.parse(data);
+
+			const currArtists: Artist[] = artistsData.artists.items;
+			const nextStartingArtist: string | null = artistsData.artists.cursors.after;
+			followedArtists = [...followedArtists, ...currArtists];
+
+			if (!nextStartingArtist) {
+				moreArtistsToDiscover = false;
+			} else {
+				startingArtist = nextStartingArtist;
+			}
+		} else {
+			moreArtistsToDiscover = false;
+		}
+	}
+
+	return followedArtists;
+};
+
+export const load: PageServerLoad = async ({ locals }) => {
+	if (!locals.spotifyAccessTokens) {
+		throw redirect(302, '/');
+	}
+
+	const accessToken: AccessTokenWithDate | undefined = locals.spotifyAccessTokens;
+	if (!accessToken) return;
+	return { artists: await getArtists(accessToken) };
+};
