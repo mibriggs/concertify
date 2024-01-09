@@ -11,12 +11,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions = {
-	authWithSpotify: async ({ cookies }) => {
+	authWithSpotify: async ({ cookies, url }) => {
 		const state = generateRandomString(20);
 		const spotifyRedirectOptions: SpotifyRedirectOptions = {
 			response_type: 'code',
 			client_id: SECRET_SPOTIFY_ID,
-			redirect_uri: 'http://localhost:3000',
+			redirect_uri: url.origin,
 			scope: 'user-follow-read',
 			state,
 			show_dialog: true

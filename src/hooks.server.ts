@@ -1,5 +1,5 @@
 import { SECRET_SPOTIFY_ID, SECRET_SPOTIFY_SECRET } from '$env/static/private';
-import { constructQueryParams, generateRandomString } from '$lib';
+import { constructQueryParams } from '$lib';
 import {
 	accessTokenSuccessResponseSchema,
 	accessTokenSchema,
@@ -8,7 +8,7 @@ import {
 	type SpotifyAccessTokenBody,
 	type SpotifyRefreshTokenBody,
 	type AccessTokenWithDate,
-	type RefreshTokens
+	type RefreshTokens,
 } from '$lib/types';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 
@@ -94,7 +94,7 @@ const setUsersTokens = async (
 	const accessTokenBody: SpotifyAccessTokenBody = {
 		grant_type: 'authorization_code',
 		code: spotifyCode,
-		redirect_uri: 'http://localhost:3000'
+		redirect_uri: url.origin
 	};
 	const base64ClientCredentials: string = btoa(`${SECRET_SPOTIFY_ID}:${SECRET_SPOTIFY_SECRET}`);
 
