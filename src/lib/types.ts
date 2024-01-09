@@ -1,7 +1,9 @@
 import { dev } from '$app/environment';
 import { z } from 'zod';
 
-export const baseRedirectUrl: string = dev? 'http://localhost:3000' : 'https://myconcertify.vercel.app';
+export const baseRedirectUrl: string = dev
+	? 'http://localhost:3000'
+	: 'https://myconcertify.vercel.app';
 
 export const accessTokenSuccessResponseSchema = z.object({
 	access_token: z.string(),

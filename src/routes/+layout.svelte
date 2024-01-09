@@ -1,14 +1,23 @@
-<script>
-	import { enhance } from '$app/forms';
+<script lang="ts">
 	import '../app.css';
+	import { enhance } from '$app/forms';
+	import type { LayoutData } from './$types';
+
+	export let data: LayoutData;
 </script>
 
 <nav class="flex text-white items-center justify-start gap-2 p-8">
 	<a href="/">Home</a>
 	<a href="/followed">Followed Artists</a>
-	<form method="post" action="/?/authWithSpotify" use:enhance>
-		<button class="text-white">Get Started</button>
-	</form>
+	{#if !data.spotifyToken}
+		<form method="post" action="/?/authWithSpotify" use:enhance class="self-end ml-auto">
+			<button class="text-white">Get Started</button>
+		</form>
+	{:else}
+		<form method="post" action="/?/logoutUser" use:enhance class="self-end ml-auto">
+			<button class="text-white">Logout</button>
+		</form>
+	{/if}
 </nav>
 <slot />
 

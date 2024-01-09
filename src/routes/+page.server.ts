@@ -32,5 +32,8 @@ export const actions = {
 
 		const spotifyUrl: string = `https://accounts.spotify.com/authorize?${spotifyAuthRequestQueryParams}`;
 		throw redirect(307, spotifyUrl);
+	},
+	logoutUser: async ({ cookies }) => {
+		cookies.getAll().forEach((cookie) => cookies.delete(cookie.name, { path: '/' }));
 	}
 };

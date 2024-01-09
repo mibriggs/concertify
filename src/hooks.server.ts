@@ -8,7 +8,7 @@ import {
 	type SpotifyAccessTokenBody,
 	type SpotifyRefreshTokenBody,
 	type AccessTokenWithDate,
-	type RefreshTokens,
+	type RefreshTokens
 } from '$lib/types';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 
