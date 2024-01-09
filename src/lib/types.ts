@@ -62,6 +62,18 @@ export const followedArtistsSuccessReponseSchema = z.object({
 	})
 });
 
+export const savedTracksSuccessResponseSchema = z.object({
+	href: z.string(),
+	limit: z.number(),
+	next: z.string().nullable(),
+	offset: z.number(),
+	previous: z.string().nullable(),
+	total: z.number(),
+	items: z.object({
+
+	}).array()
+});
+
 export type SpotifyAccessTokenBody = {
 	grant_type: 'authorization_code';
 	code: string;

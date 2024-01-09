@@ -17,7 +17,7 @@ export const actions = {
 			response_type: 'code',
 			client_id: SECRET_SPOTIFY_ID,
 			redirect_uri: url.origin,
-			scope: 'user-follow-read',
+			scope: 'user-follow-read user-library-read',
 			state,
 			show_dialog: true
 		};

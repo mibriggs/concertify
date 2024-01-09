@@ -7,7 +7,7 @@ import {
 	followedArtistsSuccessReponseSchema
 } from '$lib/types';
 
-const getArtists = async (accessToken: AccessTokenWithDate): Promise<Artist[]> => {
+const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Artist[]> => {
 	let followedArtists: Artist[] = [];
 	let moreArtistsToDiscover: boolean = true;
 	let startingArtist: string = '';
@@ -49,7 +49,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw redirect(302, '/');
 	}
 
-	const accessToken: AccessTokenWithDate | undefined = locals.spotifyAccessTokens;
-	if (!accessToken) return;
-	return { artists: await getArtists(accessToken) };
+	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
+	return { artists: await getFollowedArtists(accessToken) };
 };
