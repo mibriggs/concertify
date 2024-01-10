@@ -4,10 +4,13 @@ import { SECRET_SPOTIFY_ID } from '$env/static/private';
 import { constructQueryParams, generateRandomString } from '$lib';
 import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	return {
-		spotifyToken: locals.spotifyAccessTokens
-	};
+export const load: PageServerLoad = async ({ url }) => {
+	if (url.searchParams.has('signin')) {
+		const searchParam = url.searchParams.get('signin');
+		if (searchParam) {
+			return { toSignIn: true };
+		}
+	}
 };
 
 export const actions = {

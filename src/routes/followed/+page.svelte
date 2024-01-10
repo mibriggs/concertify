@@ -18,24 +18,24 @@
 </script>
 
 {#if data.artists}
-	<main class="flex-col text-white font-mono">
-		<div class="flex justify-between pl-8 items-center">
+	<main class="flex-col font-mono text-white">
+		<div class="flex items-center justify-between pl-8">
 			<span>Artists you Follow</span>
 			<input
 				type="text"
 				class="w-1/3 rounded-xl bg-stone-300 p-2 text-spotiblack outline-none"
-				placeholder="Search options..."
+				placeholder="Search artists..."
 			/>
 			<div class="flex gap-4 pr-6">
 				<button
-					class=" bg-slate-200 rounded-lg px-2 py-1 text-spotiblack disabled:bg-spotigreen disabled:text-white"
+					class="rounded-lg bg-slate-200 px-2 py-1 text-spotiblack disabled:bg-spotigreen disabled:text-white"
 					disabled={currIndex === 0}
 					on:click={() => (currIndex -= 1)}
 				>
 					Previous
 				</button>
 				<button
-					class=" bg-slate-200 rounded-lg px-2 py-1 text-spotiblack disabled:bg-spotigreen disabled:text-white"
+					class="rounded-lg bg-slate-200 px-2 py-1 text-spotiblack disabled:bg-spotigreen disabled:text-white"
 					disabled={currIndex === chunks.length - 1}
 					on:click={() => (currIndex += 1)}
 				>
@@ -43,18 +43,18 @@
 				</button>
 			</div>
 		</div>
-		<div class="flex flex-wrap items-center justify-center m-8 md:justify-start">
+		<div class="m-8 flex flex-wrap items-center justify-center">
 			{#each chunks[currIndex] as artist}
 				<div
-					class="flex-col items-center justify-center p-4 text-start w-72 bg-stone-500 rounded-xl m-6"
+					class="m-6 w-72 flex-col items-center justify-center rounded-xl bg-stone-500 p-4 text-start"
 				>
 					<img
 						src={artist.images[0].url}
 						alt="Artist"
-						class="w-72 h-auto rounded-lg shadow-lg mb-4"
+						class="mb-4 h-auto w-72 rounded-lg shadow-lg"
 					/>
-					<span class=" text-xl font-bold">{artist.name}</span>
-					<span class="flex text-sm text-wrap italic">Genres: {artist.genres.join(', ')}</span>
+					<span class="text-xl font-bold">{artist.name}</span>
+					<span class="flex text-wrap text-sm italic">Genres: {artist.genres.join(', ')}</span>
 				</div>
 			{/each}
 		</div>

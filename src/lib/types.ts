@@ -69,9 +69,12 @@ export const savedTracksSuccessResponseSchema = z.object({
 	offset: z.number(),
 	previous: z.string().nullable(),
 	total: z.number(),
-	items: z.object({
-
-	}).array()
+	items: z
+		.object({
+			added_at: z.string(),
+			track: z.object({})
+		})
+		.array()
 });
 
 export type SpotifyAccessTokenBody = {
