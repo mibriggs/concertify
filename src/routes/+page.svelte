@@ -2,12 +2,15 @@
 	import type { PageData } from './$types';
 	import toast from 'svelte-french-toast';
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 
 	export let data: PageData;
 
-	$: if (data.toSignIn) {
+	$: if (data.isSignedOut && data.isSignedOut === true) {
 		toast.error('You must be signed in to view this page');
-		goto('/');
+		if (browser) {
+			goto('/');
+		}
 	}
 </script>
 

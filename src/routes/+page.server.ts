@@ -5,10 +5,10 @@ import { constructQueryParams, generateRandomString } from '$lib';
 import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ url }) => {
-	if (url.searchParams.has('signin')) {
-		const searchParam = url.searchParams.get('signin');
+	if (url.searchParams.has('signedout')) {
+		const searchParam = url.searchParams.get('signedout');
 		if (searchParam) {
-			return { toSignIn: true };
+			return { isSignedOut: true };
 		}
 	}
 };

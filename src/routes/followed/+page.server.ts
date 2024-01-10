@@ -46,7 +46,7 @@ const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Art
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.spotifyAccessTokens) {
-		throw redirect(302, '/?signin=true');
+		throw redirect(302, '/?signedout=true');
 	}
 
 	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
