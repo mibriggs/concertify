@@ -1,4 +1,4 @@
-<main class="flex-col font-mono text-white">
+<main class="flex flex-col font-mono text-white">
 	<div class="flex items-center justify-between pl-8">
 		<span>Liked Artists</span>
 		<input
