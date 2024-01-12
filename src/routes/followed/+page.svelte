@@ -80,6 +80,7 @@
 						src={artist.images[0].url}
 						alt="Artist"
 						class="mb-4 h-auto w-auto rounded-lg shadow-lg"
+						loading="lazy"
 					/>
 					<span class="text-xl font-bold">{artist.name}</span>
 					<span class="flex text-wrap text-sm italic">Genres: {artist.genres.join(', ')}</span>

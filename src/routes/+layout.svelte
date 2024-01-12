@@ -10,6 +10,7 @@
 <Toaster />
 <nav class="flex items-center justify-start gap-2 p-8 font-mono text-white">
 	<a href="/">Home</a>
+	<a href="/leaders" data-sveltekit-preload-data>Top Artists</a>
 	<a href="/followed" data-sveltekit-preload-data>Followed Artists</a>
 	<a href="/liked" data-sveltekit-preload-data>Liked Artists</a>
 	{#if !data.spotifyToken}
