@@ -4,7 +4,8 @@ import {
 	type AccessTokenWithDate,
 	type Artist,
 	type FollowedArtists,
-	followedArtistsSuccessReponseSchema
+	followedArtistsSuccessReponseSchema,
+	SPOTIFY_BASE_URL
 } from '$lib/types';
 
 const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Artist[]> => {
@@ -13,7 +14,7 @@ const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Art
 	let startingArtist: string = '';
 
 	while (moreArtistsToDiscover) {
-		const fetchUrl = `https://api.spotify.com/v1/me/following?type=artist&limit=50${
+		const fetchUrl = `${SPOTIFY_BASE_URL}/me/following?type=artist&limit=50${
 			startingArtist !== '' ? '&after=' + startingArtist : ''
 		}`;
 		const response = await fetch(fetchUrl, {
