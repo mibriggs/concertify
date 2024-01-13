@@ -24,7 +24,7 @@ const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Art
 			}
 		});
 
-		if (response.status === 200) {
+		if (response.ok) {
 			const data = (await response.json()) as unknown;
 			const artistsData: FollowedArtists = followedArtistsSuccessReponseSchema.parse(data);
 

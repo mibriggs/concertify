@@ -8,7 +8,7 @@
 	afterNavigate(() => {
 		if (data.isSignedOut && data.isSignedOut === true) {
 			toast.error('You must be signed in to view this page', { duration: 900 });
-			goto('.', { replaceState: true })
+			goto('.', { replaceState: true });
 		}
 	});
 </script>

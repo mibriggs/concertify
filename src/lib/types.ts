@@ -152,9 +152,16 @@ const episodeSchema = z.object({
 
 const playlistTrackSchema = z.object({
 	added_at: z.string().datetime(),
-	added_by: userSchema,
+	added_by: userSchema.nullable(),
 	is_local: z.boolean(),
-	track: z.union([trackSchema, episodeSchema])
+});
+
+const podacastPlaylistTrackSchema = playlistTrackSchema.extend({
+	track: episodeSchema
+});
+
+const songPlaylistTrackSchema = playlistTrackSchema.extend({
+	track: trackSchema
 });
 
 const accessTokenSuccessResponseSchema = z.object({
@@ -205,15 +212,23 @@ export const savedTracksSuccessResponseSchema = z.object({
 		.array()
 });
 
-const getPlaylistSuccessResponseSchema = z.object({
+const basePlaylistResponseSchema = z.object({
 	href: z.string(),
 	limit: z.number(),
 	next: z.string().nullable(),
 	offset: z.number(),
 	previous: z.string().nullable(),
 	total: z.number(),
-	items: playlistTrackSchema.array()
 });
+
+const getSongPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
+	items: songPlaylistTrackSchema.array()
+});
+
+const getShowPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
+	items: podacastPlaylistTrackSchema.array()
+});
+
 
 export const baseRedirectUrl: string = dev
 	? 'http://localhost:3000'
@@ -246,10 +261,11 @@ export {
 	trackSchema,
 	accessTokenSuccessResponseSchema,
 	refreshTokenSuccessResponseSchema,
-	getPlaylistSuccessResponseSchema
+	getSongPlaylistSuccessResponseSchema
 };
 export type FollowedArtists = z.infer<typeof followedArtistsSuccessReponseSchema>;
 export type Artist = z.infer<typeof artistSchema>;
 export type AccessTokens = z.infer<typeof accessTokenSuccessResponseSchema>;
 export type RefreshTokens = z.infer<typeof refreshTokenSuccessResponseSchema>;
 export type AccessTokenWithDate = z.infer<typeof accessTokenSchema>;
+export type SongPlaylist = z.infer<typeof getSongPlaylistSuccessResponseSchema>;
