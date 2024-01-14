@@ -3,7 +3,7 @@
 	import type { Artist } from '$lib/types';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
-	import { fly } from 'svelte/transition';
+	import Modal from '$components/modal.svelte';
 
 	export let data: PageData;
 
@@ -25,10 +25,6 @@
 		modal?.showModal();
 	};
 
-	const closeModal = () => {
-		modal?.close();
-	};
-
 	onMount(() => {
 		if (browser) {
 			modal = document.querySelector('#modal');
@@ -40,10 +36,10 @@
 	<main class="flex flex-col font-mono text-white">
 		<div class="flex flex-col gap-2">
 			<div class="flex items-center justify-between pl-8">
-				<span class="text-xl font-bold">Artists you Follow</span>
+				<span class="sm:text-md text-sm font-bold md:text-xl">Artists you Follow</span>
 				<input
 					type="text"
-					class="hidden w-1/3 rounded-xl bg-stone-300 p-2 text-spotiblack outline-none md:block"
+					class="search hidden w-1/3 rounded-xl bg-stone-300 p-2 text-spotiblack outline-none md:block"
 					placeholder="Search artists..."
 				/>
 				<div class="flex gap-4 pr-6">
@@ -65,7 +61,7 @@
 			</div>
 			<input
 				type="text"
-				class="w-11/12 self-center rounded-xl bg-stone-300 p-2 text-spotiblack outline-none md:hidden"
+				class="search w-11/12 self-center rounded-xl bg-stone-300 p-2 text-spotiblack outline-none md:hidden"
 				placeholder="Search artists..."
 			/>
 		</div>
@@ -86,19 +82,15 @@
 					<span class="flex text-wrap text-sm italic">Genres: {artist.genres.join(', ')}</span>
 				</button>
 			{/each}
-			<dialog
-				id="modal"
-				class="modal w-5/6 rounded-xl backdrop:bg-spotiblack backdrop:bg-opacity-70 md:w-2/3 lg:w-1/2"
-			>
-				<div
-					class="flex flex-col items-center justify-center gap-2 p-8"
-				>
-					<span>{chunks[chunkIndex][artistIndex].name}</span>
-					<button on:click={closeModal} class="rounded-lg bg-spotigreen px-4 py-2 text-white"
-						>Close</button
-					>
-				</div>
-			</dialog>
+			<Modal artist={chunks[chunkIndex][artistIndex]} />
 		</div>
 	</main>
 {/if}
+
+<style>
+	.search {
+		background-image: url('$lib/assets/search.svg');
+		background-repeat: no-repeat;
+		background-position: left 95% bottom 50%;
+	}
+</style>

@@ -68,7 +68,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.spotifyAccessTokens = event.cookies.get('tokens')
 		? accessTokenSchema.parse(JSON.parse(event.cookies.get('tokens') as string))
 		: undefined;
-	return await resolve(event);
+
+	console.time('Handle');
+	const response = await resolve(event);
+	console.timeEnd('Handle');
+	return response;
 };
 
 const isSuccessResponseFromSpotify = (url: URL, cookies: Cookies): boolean => {

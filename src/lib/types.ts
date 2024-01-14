@@ -153,7 +153,7 @@ const episodeSchema = z.object({
 const playlistTrackSchema = z.object({
 	added_at: z.string().datetime(),
 	added_by: userSchema.nullable(),
-	is_local: z.boolean(),
+	is_local: z.boolean()
 });
 
 const podacastPlaylistTrackSchema = playlistTrackSchema.extend({
@@ -218,7 +218,7 @@ const basePlaylistResponseSchema = z.object({
 	next: z.string().nullable(),
 	offset: z.number(),
 	previous: z.string().nullable(),
-	total: z.number(),
+	total: z.number()
 });
 
 const getSongPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
@@ -228,7 +228,6 @@ const getSongPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
 const getShowPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
 	items: podacastPlaylistTrackSchema.array()
 });
-
 
 export const baseRedirectUrl: string = dev
 	? 'http://localhost:3000'

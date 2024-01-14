@@ -33,6 +33,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"lucide-svelte": "^0.309.0",
 		"svelte-french-toast": "^1.2.0",
 		"zod": "^3.22.2"
 	}
