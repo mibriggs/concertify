@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import type { Artist } from '$lib/types';
-	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import Modal from '$components/modal.svelte';
 	import ArtistCard from '$components/artist-card.svelte';
@@ -11,9 +9,7 @@
 
 	const chunkSize = 12;
 	const chunks: Artist[][] = [];
-	let modal: HTMLDialogElement | null;
 	let chunkIndex = 0;
-	let artistIndex = 0;
 
 	if (data.artists) {
 		for (let i = 0; i < data.artists.length; i += chunkSize) {
@@ -22,16 +18,11 @@
 		}
 	}
 
-	const openModal = (newArtistIndex: number) => {
-		artistIndex = newArtistIndex;
+	const openModal = (currArtistIndex: number) => {
+		const modalId = `#modal${chunkIndex}${currArtistIndex}`;
+		const modal: HTMLDialogElement | null = document.querySelector(modalId);
 		modal?.showModal();
 	};
-
-	onMount(() => {
-		if (browser) {
-			modal = document.querySelector('#modal');
-		}
-	});
 </script>
 
 {#if data.artists}
@@ -68,8 +59,8 @@
 					followers={artist.followers.total}
 					on:click={() => openModal(indx)}
 				/>
+				<Modal artist={chunks[chunkIndex][indx]} id={`modal${chunkIndex}${indx}`} />
 			{/each}
-			<Modal artist={chunks[chunkIndex][artistIndex]} />
 		</div>
 	</main>
 {/if}
