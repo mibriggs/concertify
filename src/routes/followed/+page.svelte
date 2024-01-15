@@ -4,6 +4,8 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import Modal from '$components/modal.svelte';
+	import ArtistCard from '$components/artist-card.svelte';
+	import Button from '$components/button.svelte';
 
 	export let data: PageData;
 
@@ -43,20 +45,10 @@
 					placeholder="Search artists..."
 				/>
 				<div class="flex gap-4 pr-6">
-					<button
-						class="rounded-lg bg-slate-200 px-2 py-1 text-spotiblack disabled:bg-spotigreen disabled:text-white"
-						disabled={chunkIndex === 0}
-						on:click={() => (chunkIndex -= 1)}
-					>
-						Previous
-					</button>
-					<button
-						class="rounded-lg bg-slate-200 px-2 py-1 text-spotiblack disabled:bg-spotigreen disabled:text-white"
-						disabled={chunkIndex === chunks.length - 1}
-						on:click={() => (chunkIndex += 1)}
-					>
+					<Button disabled={chunkIndex === 0} on:click={() => (chunkIndex -= 1)}>Previous</Button>
+					<Button disabled={chunkIndex === chunks.length - 1} on:click={() => (chunkIndex += 1)}>
 						Next
-					</button>
+					</Button>
 				</div>
 			</div>
 			<input
@@ -68,19 +60,14 @@
 
 		<div class="flex flex-wrap items-center justify-center">
 			{#each chunks[chunkIndex] as artist, indx}
-				<button
-					class="m-6 flex w-80 flex-col items-center justify-center rounded-xl bg-stone-500 p-4 text-start"
+				<ArtistCard
+					imageUrl={artist.images[0].url}
+					name={artist.name}
+					popularity={artist.popularity}
+					genres={artist.genres}
+					followers={artist.followers.total}
 					on:click={() => openModal(indx)}
-				>
-					<img
-						src={artist.images[0].url}
-						alt="Artist"
-						class="mb-4 h-auto w-auto rounded-lg shadow-lg"
-						loading="lazy"
-					/>
-					<span class="text-xl font-bold">{artist.name}</span>
-					<span class="flex text-wrap text-sm italic">Genres: {artist.genres.join(', ')}</span>
-				</button>
+				/>
 			{/each}
 			<Modal artist={chunks[chunkIndex][artistIndex]} />
 		</div>

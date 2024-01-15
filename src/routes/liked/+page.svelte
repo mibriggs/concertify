@@ -1,3 +1,7 @@
+<script lang="ts">
+	import Button from '$components/button.svelte';
+</script>
+
 <main class="flex flex-col font-mono text-white">
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between pl-8">
@@ -8,21 +12,13 @@
 				placeholder="Search artists..."
 			/>
 			<div class="flex gap-4 pr-6">
-				<button
-					class="rounded-lg bg-slate-200 px-2 py-1 text-spotiblack disabled:bg-spotigreen disabled:text-white"
-				>
-					Previous
-				</button>
-				<button
-					class="rounded-lg bg-slate-200 px-2 py-1 text-spotiblack disabled:bg-spotigreen disabled:text-white"
-				>
-					Next
-				</button>
+				<Button>Previous</Button>
+				<Button>Next</Button>
 			</div>
 		</div>
 		<input
 			type="text"
-			class="search w-11/12 self-center rounded-xl bg-stone-300 p-2 text-spotiblack outline-none md:hidden "
+			class="search w-11/12 self-center rounded-xl bg-stone-300 p-2 text-spotiblack outline-none md:hidden"
 			placeholder="Search artists..."
 		/>
 	</div>

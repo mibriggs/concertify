@@ -14,3 +14,11 @@ export const constructQueryParams = (queryObject: Object) => {
 	Object.entries(queryObject).forEach((queryParam) => queryParams.push(queryParam.join('=')));
 	return queryParams.join('&');
 };
+
+export const formatNumber = (numToFormat: number): string => {
+	const newNum = Intl.NumberFormat('en-US', {
+		notation: 'compact',
+		maximumFractionDigits: 1
+	}).format(numToFormat);
+	return newNum;
+};
