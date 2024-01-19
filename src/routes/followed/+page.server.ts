@@ -7,6 +7,8 @@ import {
 	followedArtistsSuccessReponseSchema,
 	SPOTIFY_BASE_URL
 } from '$lib/types';
+import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
+import { constructQueryParams } from '$lib';
 
 const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Artist[]> => {
 	let followedArtists: Artist[] = [];
@@ -55,7 +57,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	getConcertInfo: async () => {
-		console.log('Hello world from server');
+	getConcertInfo: async ({ request, cookies }) => {
+		const data = await request.formData();
+		const artistName: string = data.has('artist') ? (data.get('artist')?.toString() as string) : '';
+		console.log(artistName);
+		const queryParams: Record<string, string> = {
+			classificationName: 'music',
+			apikey: SECRET_TICKETMASTER_TOKEN,
+			keyword: artistName,
+			geoPoint: '',
+			radius: '10',
+			unit: 'miles',
+			sort: 'date,asc'
+		};
+		console.log(encodeURIComponent(constructQueryParams(queryParams)));
 	}
 };

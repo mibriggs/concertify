@@ -38,5 +38,6 @@ export const actions = {
 	},
 	logoutUser: async ({ cookies }) => {
 		cookies.getAll().forEach((cookie) => cookies.delete(cookie.name, { path: '/' }));
+		throw redirect(302, '/');
 	}
 };

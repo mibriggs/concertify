@@ -1,3 +1,5 @@
+import { encodeBase32 } from 'geohashing';
+
 // place files you want to import through the `$lib` alias in this folder.
 const CHARACTERS = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -21,4 +23,25 @@ export const formatNumber = (numToFormat: number): string => {
 		maximumFractionDigits: 1
 	}).format(numToFormat);
 	return newNum;
+};
+
+export const getGeoLocation = () => {
+	console.log('Get geo location function called');
+	if (navigator.geolocation) {
+		console.log('Navigator geolocation exists');
+		navigator.geolocation.watchPosition(onLocationSuccess, onLocationError);
+	}
+};
+
+const onLocationSuccess = (position: GeolocationPosition) => {
+	console.log('Success callback');
+	const coords: GeolocationCoordinates = position.coords;
+	const geoHashString = encodeBase32(coords.latitude, coords.longitude, 9);
+	console.log(geoHashString);
+	document.cookie = `geoHash=${geoHashString}; path=/`;
+};
+
+const onLocationError = (err: GeolocationPositionError) => {
+	console.log('Error callback');
+	console.warn(`ERROR(${err.code}): ${err.message}`);
 };
