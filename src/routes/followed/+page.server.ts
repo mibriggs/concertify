@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import {
 	type AccessTokenWithDate,
 	type Artist,
@@ -52,4 +52,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
 	return { artists: await getFollowedArtists(accessToken) };
+};
+
+export const actions: Actions = {
+	getConcertInfo: async () => {
+		console.log('Hello world from server');
+	}
 };
