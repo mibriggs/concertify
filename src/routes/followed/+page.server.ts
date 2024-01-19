@@ -1,14 +1,13 @@
-import { redirect } from '@sveltejs/kit';
+import { redirect, type Cookies } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import {
 	type AccessTokenWithDate,
 	type Artist,
 	type FollowedArtists,
-	followedArtistsSuccessReponseSchema,
-	SPOTIFY_BASE_URL
+	followedArtistsSuccessReponseSchema
 } from '$lib/types';
 import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
-import { constructQueryParams } from '$lib';
+import { SPOTIFY_BASE_URL, TICKETMASTER_BASE_URL, constructQueryParams } from '$lib';
 
 const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Artist[]> => {
 	let followedArtists: Artist[] = [];
@@ -58,18 +57,33 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	getConcertInfo: async ({ request, cookies }) => {
-		const data = await request.formData();
-		const artistName: string = data.has('artist') ? (data.get('artist')?.toString() as string) : '';
-		console.log(artistName);
-		const queryParams: Record<string, string> = {
-			classificationName: 'music',
-			apikey: SECRET_TICKETMASTER_TOKEN,
-			keyword: artistName,
-			geoPoint: '',
-			radius: '10',
-			unit: 'miles',
-			sort: 'date,asc'
-		};
-		console.log(encodeURIComponent(constructQueryParams(queryParams)));
+		await _fetchConcertInfo(request, cookies);
 	}
+};
+
+export const _fetchConcertInfo = async (request: Request, cookies: Cookies) => {
+	const data = await request.formData();
+	const artistName: string = data.has('artist') ? (data.get('artist')?.toString() as string) : '';
+	const geoHashString = cookies.get('geoHash');
+
+	console.log(artistName);
+	const queryParams: Record<string, string> = {
+		classificationName: 'music',
+		apikey: SECRET_TICKETMASTER_TOKEN,
+		keyword: artistName.toLowerCase(),
+		radius: '10',
+		unit: 'miles',
+		sort: 'date,asc'
+	};
+
+	if (geoHashString) {
+		queryParams.geoPoint = geoHashString;
+	}
+
+	const queryParamString: string = constructQueryParams(queryParams);
+	const fetchUrl: string = encodeURI(`${TICKETMASTER_BASE_URL}/events.json?${queryParamString}`);
+	console.log(fetchUrl);
+	const response = await fetch(fetchUrl);
+	const asJson = await response.json();
+	console.log(asJson);
 };

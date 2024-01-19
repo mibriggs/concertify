@@ -3,8 +3,15 @@
 	import { enhance } from '$app/forms';
 	import type { LayoutData } from './$types';
 	import { Toaster } from 'svelte-french-toast';
+	import { afterNavigate } from '$app/navigation';
+	import { getGeoLocation } from '$lib';
 
 	export let data: LayoutData;
+
+	afterNavigate(() => {
+		console.log('Navigation ended');
+		getGeoLocation();
+	});
 </script>
 
 <Toaster />

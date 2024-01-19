@@ -55,17 +55,14 @@
 
 		<div class="flex flex-wrap items-center justify-center">
 			{#each chunks[chunkIndex] as artist, indx}
-				<form method="post" action="?/getConcertInfo" use:enhance>
-					<input type="hidden" name="artist" value={artist.name} />
-					<ArtistCard
-						imageUrl={artist.images[0].url}
-						name={artist.name}
-						popularity={artist.popularity}
-						genres={artist.genres}
-						followers={artist.followers.total}
-						on:click={() => openModal(indx)}
-					/>
-				</form>
+				<ArtistCard
+					imageUrl={artist.images[0].url}
+					name={artist.name}
+					popularity={artist.popularity}
+					genres={artist.genres}
+					followers={artist.followers.total}
+					on:click={() => openModal(indx)}
+				/>
 				<Modal artist={chunks[chunkIndex][indx]} id={`modal${chunkIndex}${indx}`} />
 			{/each}
 		</div>

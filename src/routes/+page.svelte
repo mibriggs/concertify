@@ -2,13 +2,10 @@
 	import type { PageData } from './$types';
 	import toast from 'svelte-french-toast';
 	import { afterNavigate, goto } from '$app/navigation';
-	import { getGeoLocation } from '$lib';
 
 	export let data: PageData;
 
 	afterNavigate(() => {
-		console.log('Navigation ended');
-		getGeoLocation();
 		if (data.isSignedOut && data.isSignedOut === true) {
 			toast.error('You must be signed in to view this page', { duration: 900 });
 			goto('.', { replaceState: true });

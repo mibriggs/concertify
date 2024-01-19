@@ -1,6 +1,13 @@
+import { dev } from '$app/environment';
 import { encodeBase32 } from 'geohashing';
 
-// place files you want to import through the `$lib` alias in this folder.
+export const baseRedirectUrl: string = dev
+	? 'http://localhost:3000'
+	: 'https://myconcertify.vercel.app';
+
+export const SPOTIFY_BASE_URL = 'https://api.spotify.com/v1';
+export const TICKETMASTER_BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
+
 const CHARACTERS = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
 export const generateRandomString = (length: number) => {
@@ -26,10 +33,23 @@ export const formatNumber = (numToFormat: number): string => {
 };
 
 export const getGeoLocation = () => {
+	const SECONDS = 1000;
+	const MINUTES = 60;
+	const fiveMinutes = 5 * SECONDS * MINUTES;
+	const tenSeconds = 10 * SECONDS;
+
+	const options: PositionOptions = {
+		enableHighAccuracy: true,
+		maximumAge: fiveMinutes,
+		timeout: tenSeconds
+	};
+
 	console.log('Get geo location function called');
 	if (navigator.geolocation) {
 		console.log('Navigator geolocation exists');
-		navigator.geolocation.watchPosition(onLocationSuccess, onLocationError);
+		navigator.geolocation.watchPosition(onLocationSuccess, onLocationError, options);
+	} else {
+		console.warn('No geolocation support received');
 	}
 };
 

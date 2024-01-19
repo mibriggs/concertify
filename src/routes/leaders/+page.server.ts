@@ -1,10 +1,7 @@
-import {
-	SPOTIFY_BASE_URL,
-	type AccessTokenWithDate,
-	getSongPlaylistSuccessResponseSchema
-} from '$lib/types';
+import { type AccessTokenWithDate, getSongPlaylistSuccessResponseSchema } from '$lib/types';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { SPOTIFY_BASE_URL } from '$lib';
 
 const getTop50SongsPlaylist = async (accessToken: AccessTokenWithDate) => {
 	const top50PlaylistId = '37i9dQZEVXbMDoHDwVN2tF';

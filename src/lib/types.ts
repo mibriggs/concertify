@@ -229,12 +229,6 @@ const getShowPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
 	items: podacastPlaylistTrackSchema.array()
 });
 
-export const baseRedirectUrl: string = dev
-	? 'http://localhost:3000'
-	: 'https://myconcertify.vercel.app';
-
-export const SPOTIFY_BASE_URL = 'https://api.spotify.com/v1';
-
 export type SpotifyAccessTokenBody = {
 	grant_type: 'authorization_code';
 	code: string;
