@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { Artist } from '$lib/types';
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 	import Modal from '$components/modal.svelte';
 	import ArtistCard from '$components/artist-card.svelte';
 	import Button from '$components/button.svelte';
-	import { enhance } from '$app/forms';
 	import SearchBar from '$components/search-bar.svelte';
 
 	export let data: PageData;
+	export let form: ActionData;
 
 	const chunkSize = 12;
 	const chunks: Artist[][] = [];
@@ -63,7 +63,7 @@
 					followers={artist.followers.total}
 					on:click={() => openModal(indx)}
 				/>
-				<Modal artist={chunks[chunkIndex][indx]} id={`modal${chunkIndex}${indx}`} />
+				<Modal artist={chunks[chunkIndex][indx]} id={`modal${chunkIndex}${indx}`} concertInfo={form?.concertInfo} />
 			{/each}
 		</div>
 	</main>

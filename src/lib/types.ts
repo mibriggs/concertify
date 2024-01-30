@@ -229,6 +229,20 @@ const getShowPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
 	items: podacastPlaylistTrackSchema.array()
 });
 
+const concertEventSuccessSchema = z.object({
+	_links: z.object({
+		self: z.object({
+			href: z.string()
+		})
+	}),
+	page: z.object({
+		size: z.number(),
+		totalElements: z.number(),
+		totalPages: z.number(),
+		number: z.number()
+	})
+})
+
 export type SpotifyAccessTokenBody = {
 	grant_type: 'authorization_code';
 	code: string;
@@ -254,7 +268,8 @@ export {
 	trackSchema,
 	accessTokenSuccessResponseSchema,
 	refreshTokenSuccessResponseSchema,
-	getSongPlaylistSuccessResponseSchema
+	getSongPlaylistSuccessResponseSchema,
+	concertEventSuccessSchema
 };
 export type FollowedArtists = z.infer<typeof followedArtistsSuccessReponseSchema>;
 export type Artist = z.infer<typeof artistSchema>;
@@ -262,3 +277,4 @@ export type AccessTokens = z.infer<typeof accessTokenSuccessResponseSchema>;
 export type RefreshTokens = z.infer<typeof refreshTokenSuccessResponseSchema>;
 export type AccessTokenWithDate = z.infer<typeof accessTokenSchema>;
 export type SongPlaylist = z.infer<typeof getSongPlaylistSuccessResponseSchema>;
+export type Concert = z.infer<typeof concertEventSuccessSchema>;

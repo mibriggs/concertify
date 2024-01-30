@@ -4,7 +4,9 @@ import {
 	type AccessTokenWithDate,
 	type Artist,
 	type FollowedArtists,
-	followedArtistsSuccessReponseSchema
+	followedArtistsSuccessReponseSchema,
+	concertEventSuccessSchema,
+	type Concert
 } from '$lib/types';
 import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
 import { SPOTIFY_BASE_URL, TICKETMASTER_BASE_URL, constructQueryParams } from '$lib';
@@ -57,16 +59,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	getConcertInfo: async ({ request, cookies }) => {
-		await _fetchConcertInfo(request, cookies);
+		return {concertInfo: await _fetchConcertInfo(request, cookies)};
 	}
 };
 
-export const _fetchConcertInfo = async (request: Request, cookies: Cookies) => {
+export const _fetchConcertInfo = async (request: Request, cookies: Cookies): Promise<Concert | undefined>  => {
 	const data = await request.formData();
 	const artistName: string = data.has('artist') ? (data.get('artist')?.toString() as string) : '';
 	const geoHashString = cookies.get('geoHash');
 
-	console.log(artistName);
 	const queryParams: Record<string, string> = {
 		classificationName: 'music',
 		apikey: SECRET_TICKETMASTER_TOKEN,
@@ -82,8 +83,15 @@ export const _fetchConcertInfo = async (request: Request, cookies: Cookies) => {
 
 	const queryParamString: string = constructQueryParams(queryParams);
 	const fetchUrl: string = encodeURI(`${TICKETMASTER_BASE_URL}/events.json?${queryParamString}`);
-	console.log(fetchUrl);
+	
 	const response = await fetch(fetchUrl);
-	const asJson = await response.json();
-	console.log(asJson);
+	if (response.ok) {
+		const data = (await response.json()) as unknown;
+		const maybeConcerts = concertEventSuccessSchema.safeParse(data);
+
+		if (maybeConcerts.success) {
+			const concertData = maybeConcerts.data;
+			return concertData;
+		}
+	}
 };
