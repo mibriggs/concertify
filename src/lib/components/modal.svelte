@@ -19,7 +19,7 @@
 	const closeWithOutsideTap = (event: MouseEvent) => {
 		const target = event.target;
 		if (target instanceof HTMLElement && target.nodeName === 'DIALOG') {
-			modal?.close();
+			closeModal();
 		}
 	}
 
