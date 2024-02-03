@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { formatNumber } from '$lib';
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import { UserCheck } from 'lucide-svelte';
 
 	export let imageUrl: string;
@@ -8,9 +9,15 @@
 	export let popularity: number;
 	export let genres: string[];
 	export let followers: number;
+
+	const submitGetConcertInfo: SubmitFunction = () => {
+		return async ({ update }) => {
+			await update({ invalidateAll: false });
+		};
+	};
 </script>
 
-<form method="post" action="?/getConcertInfo" use:enhance>
+<form method="post" action="?/getConcertInfo" use:enhance={submitGetConcertInfo}>
 	<input type="hidden" name="artist" value={name} />
 
 	<button

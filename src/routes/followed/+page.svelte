@@ -27,6 +27,14 @@
 		modal?.showModal();
 	};
 
+	let currArtistIndex: number;
+	const openModalV2 = (artistIndex: number) => {
+		currArtistIndex = artistIndex;
+		const modalId = '#modal';
+		const modal: HTMLDialogElement | null = document.querySelector(modalId);
+		modal?.showModal();
+	};
+
 	$: isOnFirstPage = chunkIndex === 0;
 	$: isOnLastPage = chunkIndex === chunks.length - 1;
 </script>
@@ -61,10 +69,16 @@
 					popularity={artist.popularity}
 					genres={artist.genres}
 					followers={artist.followers.total}
-					on:click={() => openModal(indx)}
+					on:click={() => openModalV2(indx)}
 				/>
-				<Modal artist={chunks[chunkIndex][indx]} id={`modal${chunkIndex}${indx}`} concertInfo={form?.concertInfo} />
+				<!-- <Modal artist={chunks[chunkIndex][indx]} id={`modal${chunkIndex}${indx}`} concertInfo={form?.concertInfo} /> -->
 			{/each}
+			<Modal
+				artist={chunks[chunkIndex][currArtistIndex]}
+				concertInfo={form?.concertInfo}
+				concertDate={form?.concertInfo ? 'April 14, 2024' : 'n/a'}
+				concertLocation={form?.concertInfo ? 'House of Blues' : 'n/a'}
+			/>
 		</div>
 	</main>
 {/if}

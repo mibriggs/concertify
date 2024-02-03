@@ -54,10 +54,8 @@ export const getGeoLocation = () => {
 };
 
 const onLocationSuccess = (position: GeolocationPosition) => {
-	console.log('Success callback');
 	const coords: GeolocationCoordinates = position.coords;
 	const geoHashString = encodeBase32(coords.latitude, coords.longitude, 9);
-	console.log(geoHashString);
 	document.cookie = `geoHash=${geoHashString}; path=/`;
 };
 

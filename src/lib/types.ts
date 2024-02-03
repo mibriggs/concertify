@@ -1,4 +1,3 @@
-import { dev } from '$app/environment';
 import { z } from 'zod';
 
 const externalUrlSchema = z.object({
@@ -230,6 +229,29 @@ const getShowPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
 });
 
 const concertEventSuccessSchema = z.object({
+	_embedded: z
+		.object({
+			events: z
+				.object({
+					name: z.string(),
+					type: z.string(),
+					id: z.string(),
+					test: z.boolean(),
+					url: z.string(),
+					locale: z.string(),
+					images: z
+						.object({
+							ratio: z.string(),
+							url: z.string(),
+							width: z.number(),
+							height: z.number(),
+							fallback: z.boolean()
+						})
+						.array()
+				})
+				.array()
+		})
+		.optional(),
 	_links: z.object({
 		self: z.object({
 			href: z.string()
@@ -241,7 +263,7 @@ const concertEventSuccessSchema = z.object({
 		totalPages: z.number(),
 		number: z.number()
 	})
-})
+});
 
 export type SpotifyAccessTokenBody = {
 	grant_type: 'authorization_code';

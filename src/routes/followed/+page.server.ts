@@ -11,6 +11,15 @@ import {
 import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
 import { SPOTIFY_BASE_URL, TICKETMASTER_BASE_URL, constructQueryParams } from '$lib';
 
+export const load: PageServerLoad = async ({ locals }) => {
+	if (!locals.spotifyAccessTokens) {
+		throw redirect(302, '/?signedout=true');
+	}
+
+	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
+	return { artists: await getFollowedArtists(accessToken) };
+};
+
 const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Artist[]> => {
 	let followedArtists: Artist[] = [];
 	let moreArtistsToDiscover: boolean = true;
@@ -48,22 +57,20 @@ const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Art
 	return followedArtists;
 };
 
-export const load: PageServerLoad = async ({ locals }) => {
-	if (!locals.spotifyAccessTokens) {
-		throw redirect(302, '/?signedout=true');
-	}
-
-	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
-	return { artists: await getFollowedArtists(accessToken) };
-};
-
 export const actions: Actions = {
 	getConcertInfo: async ({ request, cookies }) => {
-		return {concertInfo: await _fetchConcertInfo(request, cookies)};
+		const concertInfo = await _fetchConcertInfo(request, cookies);
+		if (concertInfo && concertInfo.page.totalElements === 0) {
+			return { concertInfo: undefined };
+		}
+		return { concertInfo: concertInfo };
 	}
 };
 
-export const _fetchConcertInfo = async (request: Request, cookies: Cookies): Promise<Concert | undefined>  => {
+export const _fetchConcertInfo = async (
+	request: Request,
+	cookies: Cookies
+): Promise<Concert | undefined> => {
 	const data = await request.formData();
 	const artistName: string = data.has('artist') ? (data.get('artist')?.toString() as string) : '';
 	const geoHashString = cookies.get('geoHash');
@@ -83,7 +90,7 @@ export const _fetchConcertInfo = async (request: Request, cookies: Cookies): Pro
 
 	const queryParamString: string = constructQueryParams(queryParams);
 	const fetchUrl: string = encodeURI(`${TICKETMASTER_BASE_URL}/events.json?${queryParamString}`);
-	
+
 	const response = await fetch(fetchUrl);
 	if (response.ok) {
 		const data = (await response.json()) as unknown;
@@ -92,6 +99,8 @@ export const _fetchConcertInfo = async (request: Request, cookies: Cookies): Pro
 		if (maybeConcerts.success) {
 			const concertData = maybeConcerts.data;
 			return concertData;
+		} else {
+			console.log(maybeConcerts.error.errors);
 		}
 	}
 };
