@@ -8,12 +8,12 @@
 	export let concertDate: string;
 	export let concertInfo: Concert | undefined;
 
-	let modal: HTMLDialogElement | null; 
+	let modal: HTMLDialogElement | null;
 	let isClosing: boolean = false;
-	
+
 	onMount(() => {
 		modal = document.querySelector('#modal');
-		modal?.addEventListener('click', closeWithOutsideTap)
+		modal?.addEventListener('click', closeWithOutsideTap);
 	});
 
 	const closeWithOutsideTap = (event: MouseEvent) => {
@@ -21,24 +21,28 @@
 		if (target instanceof HTMLElement && target.nodeName === 'DIALOG') {
 			closeModal();
 		}
-	}
+	};
 
 	const closeModal = () => {
 		isClosing = true;
-		modal?.addEventListener('animationend', () => {
-			isClosing = false;
-			modal?.close();
-		}, { once: true });
+		modal?.addEventListener('animationend', closeModalHelper, { once: true });
+	};
+
+	const closeModalHelper = () => {
+		isClosing = false;
+		modal?.close();
 	};
 </script>
 
 <dialog
 	id="modal"
-	class="max-w-[550px h-fit w-5/6 rounded-3xl border border-gray-400 bg-spotiblack text-white shadow-lg backdrop:bg-spotiblack backdrop:bg-opacity-70 backdrop:backdrop-blur-md md:w-2/3 lg:w-1/2"
-	data-closing={isClosing? "true" : null}
+	class="max-w-[550px h-fit w-11/12 rounded-3xl border border-gray-400 bg-spotiblack text-white shadow-lg backdrop:bg-spotiblack backdrop:bg-opacity-70 backdrop:backdrop-blur-md md:w-2/3 lg:w-1/2"
+	data-closing={isClosing ? 'true' : null}
 >
 	{#if artist}
-		<div class="flex flex-col items-center justify-center break-words font-mono md:text-lg w-full py-4">
+		<div
+			class="flex w-full flex-col items-center justify-center break-words py-4 font-mono md:text-lg"
+		>
 			<div class="py-4 font-semibold">
 				{artist.name}
 			</div>
@@ -101,17 +105,13 @@
 	}
 
 	#modal[open] {
-		animation:
-		slide-up 600ms forwards,
-		fade-in 650ms forwards;
+		animation: slide-up 650ms forwards, fade-in 650ms forwards;
 	}
 
 	#modal[data-closing='true'] {
 		display: block;
 		pointer-events: none;
 		inset: 0;
-		animation:
-		slide-down 275ms forwards,
-		fade-out 275ms forwards;
+		animation: slide-down 275ms forwards, fade-out 275ms forwards;
 	}
 </style>
