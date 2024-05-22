@@ -42,23 +42,31 @@
 {#if data.artists}
 	<main class="flex flex-col font-mono text-white">
 		<div class="flex flex-col gap-2">
-			<div class="flex items-center justify-between pl-8">
+			<!-- For larger screens -->
+			<div class="hidden items-center justify-between pl-8 md:flex">
 				<span class="sm:text-md text-sm font-bold md:text-xl">Artists you Follow</span>
-				<SearchBar
-					placeholder="Search followed artists..."
-					extraStyling="hidden w-1/3 md:block"
-					bind:value={searchValue}
-				/>
+				<div class="w-5/12">
+					<SearchBar placeholder="Search artists..." bind:value={searchValue} />
+				</div>
 				<div class="flex gap-4 pr-6">
 					<Button disabled={isOnFirstPage} on:click={() => (chunkIndex -= 1)}>Previous</Button>
 					<Button disabled={isOnLastPage} on:click={() => (chunkIndex += 1)}>Next</Button>
 				</div>
 			</div>
-			<SearchBar
-				placeholder="Search followed artists..."
-				extraStyling="w-11/12 self-center md:hidden"
-				bind:value={searchValue}
-			/>
+
+			<!-- For smaller screens -->
+			<div class="flex flex-col items-center justify-center gap-2 px-6 md:hidden">
+				<div class="flex w-full items-center justify-between gap-2">
+					<span class="sm:text-md text-sm font-bold md:text-xl">Artists you Follow</span>
+					<div class="flex gap-4">
+						<Button disabled={isOnFirstPage} on:click={() => (chunkIndex -= 1)}>Previous</Button>
+						<Button disabled={isOnLastPage} on:click={() => (chunkIndex += 1)}>Next</Button>
+					</div>
+				</div>
+				<div class="w-full">
+					<SearchBar placeholder="Search artists..." bind:value={searchValue} />
+				</div>
+			</div>
 		</div>
 
 		<div class="flex flex-wrap items-center justify-center">

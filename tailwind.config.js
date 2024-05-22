@@ -6,6 +6,12 @@ export default {
 			colors: {
 				spotigreen: '#1DB954',
 				spotiblack: '#191414'
+			},
+			backgroundImage: {
+				search: "url('$lib/assets/search.svg')"
+			},
+			backgroundPosition: {
+				'left-center': 'left 2% bottom 50%'
 			}
 		}
 	},
