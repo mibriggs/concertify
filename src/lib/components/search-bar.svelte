@@ -7,19 +7,19 @@
 	const clearSearchBar = () => {
 		const searchElement: HTMLElement | null = document.getElementById('search');
 		if (searchElement) {
-			console.log("Search element exists")
+			console.log('Search element exists');
 			searchElement.focus();
-			value = "";
+			value = '';
 		}
-	}
+	};
 </script>
 
 <div
-	class="flex w-full rounded-xl bg-stone-300 bg-search bg-left-center bg-no-repeat py-2 pl-12 text-spotiblack outline-none items-center justify-between"
+	class="flex w-full items-center justify-between rounded-xl bg-stone-300 bg-search bg-left-center bg-no-repeat py-2 pl-12 text-spotiblack outline-none"
 >
-	<input id="search" type="text" class="bg-inherit outline-none w-full" {placeholder} bind:value />
+	<input id="search" type="text" class="w-full bg-inherit outline-none" {placeholder} bind:value />
 	<button on:click={clearSearchBar} class=" pr-2">
-		<div class=" border-2 rounded-full border-spotiblack hover:border-red-600 hover:text-red-600">
+		<div class=" rounded-full border-2 border-spotiblack hover:border-red-600 hover:text-red-600">
 			<X />
 		</div>
 	</button>

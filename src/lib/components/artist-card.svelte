@@ -21,7 +21,7 @@
 	<input type="hidden" name="artist" value={name} />
 
 	<button
-		class="m-6 flex w-80 flex-col items-center justify-center gap-1 rounded-xl bg-stone-500 p-4 text-start"
+		class="m-6 flex w-80 transform flex-col items-center justify-center gap-1 rounded-xl bg-stone-500 p-4 text-start transition-all duration-[225ms] hover:scale-[1.08] hover:opacity-60"
 		on:click
 	>
 		<img

@@ -41,7 +41,7 @@
 
 {#if data.artists}
 	<main class="flex flex-col font-mono text-white">
-		<div class="flex flex-col gap-2">
+		<div class="sticky top-[5rem] z-10 flex flex-col gap-2 bg-spotiblack pb-3">
 			<!-- For larger screens -->
 			<div class="hidden items-center justify-between pl-8 md:flex">
 				<span class="sm:text-md text-sm font-bold md:text-xl">Artists you Follow</span>
@@ -79,7 +79,6 @@
 					followers={artist.followers.total}
 					on:click={() => openModalV2(indx)}
 				/>
-				<!-- <Modal artist={chunks[chunkIndex][indx]} id={`modal${chunkIndex}${indx}`} concertInfo={form?.concertInfo} /> -->
 			{/each}
 			<Modal
 				artist={chunks[chunkIndex][currArtistIndex]}
