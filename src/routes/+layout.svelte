@@ -43,7 +43,8 @@
 		method="post"
 		action={!data.spotifyToken ? '/?/authWithSpotify' : '/?/logoutUser'}
 		use:enhance
-		class="ml-auto self-end rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-red-600"
+		class="ml-auto self-end rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-spotigreen"
+		class:signed-in={data.spotifyToken}
 	>
 		<button class="text-white">{!data.spotifyToken ? 'Get Started' : 'Logout'}</button>
 	</form>
@@ -63,5 +64,9 @@
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: var(--max-lines);
 		width: fit-content;
+	}
+
+	.signed-in {
+		@apply hover:bg-red-600;
 	}
 </style>
