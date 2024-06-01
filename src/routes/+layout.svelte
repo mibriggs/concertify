@@ -46,7 +46,7 @@
 		class="ml-auto self-end rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-spotigreen"
 		class:signed-in={data.spotifyToken}
 	>
-		<button class="cutoff-text text-white">{!data.spotifyToken ? 'Get Started' : 'Logout'}</button>
+		<button class="cutoff-text text-white">{!data.spotifyToken ? 'Login' : 'Logout'}</button>
 	</form>
 </nav>
 <slot />
