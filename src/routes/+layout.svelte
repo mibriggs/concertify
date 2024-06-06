@@ -5,7 +5,7 @@
 	import { Toaster } from 'svelte-french-toast';
 	import { afterNavigate } from '$app/navigation';
 	import { getGeoLocation } from '$lib';
-	import { Menu } from 'lucide-svelte';
+	import { Menu, X } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
 
 	export let data: LayoutData;
@@ -74,7 +74,11 @@
 			on:click={() => (showHamburgerMenu = !showHamburgerMenu)}
 		>
 			<span class="sr-only">Open main menu</span>
+			{#if !showHamburgerMenu}
 			<Menu size="32" />
+			{:else}
+			<X size="32" />
+			{/if}
 		</button>
 		{#if showHamburgerMenu}			
 		<div
