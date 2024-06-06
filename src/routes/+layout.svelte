@@ -42,7 +42,7 @@
 		<a
 			href="/liked"
 			data-sveltekit-preload-data
-			class="cutoff-text rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-gray-100"
+			class="cutoff-text rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-spotigreen"
 		>
 			Liked Artists
 		</a>

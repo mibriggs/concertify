@@ -6,7 +6,7 @@
 </script>
 
 <main class="flex flex-col font-mono text-white">
-	<div class="sticky top-[5rem] z-10 flex flex-col gap-2 bg-spotiblack pb-3">
+	<div class="sticky top-20 z-10 flex flex-col gap-2 bg-spotiblack py-3">
 		<!-- For larger screens -->
 		<div class="hidden items-center justify-between pl-8 md:flex">
 			<span class="sm:text-md text-sm font-bold md:text-xl">Artists you Like</span>
