@@ -6,6 +6,7 @@
 	import { afterNavigate } from '$app/navigation';
 	import { getGeoLocation } from '$lib';
 	import { Menu } from 'lucide-svelte';
+	import { slide } from 'svelte/transition';
 
 	export let data: LayoutData;
 
@@ -57,7 +58,7 @@
 	</form>
 </nav>
 
-<nav class="sticky top-0 z-10 border-gray-200 bg-spotiblack md:hidden">
+<nav class="sticky top-0 z-[1000] border-gray-200 bg-spotiblack md:hidden">
 	<div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
 		<a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
 			<span class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
@@ -75,10 +76,12 @@
 			<span class="sr-only">Open main menu</span>
 			<Menu size="32" />
 		</button>
+		{#if showHamburgerMenu}			
 		<div
-			class="sticky top-0 z-10 hidden w-full"
+			class="w-full fixed top-14 left-0"
 			id="navbar-hamburger"
-			class:visible={showHamburgerMenu}
+			in:slide
+			out:slide
 		>
 			<ul
 				class="mt-4 flex flex-col rounded-lg bg-gray-200 font-medium dark:border-gray-700 dark:bg-gray-800"
@@ -127,6 +130,7 @@
 				</li>
 			</ul>
 		</div>
+		{/if}
 	</div>
 </nav>
 
@@ -149,9 +153,5 @@
 
 	.signed-in {
 		@apply hover:bg-red-600;
-	}
-
-	.visible {
-		display: unset;
 	}
 </style>
