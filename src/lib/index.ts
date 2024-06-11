@@ -44,9 +44,7 @@ export const getGeoLocation = () => {
 		timeout: tenSeconds
 	};
 
-	console.log('Get geo location function called');
 	if (navigator.geolocation) {
-		console.log('Navigator geolocation exists');
 		navigator.geolocation.watchPosition(onLocationSuccess, onLocationError, options);
 	} else {
 		console.warn('No geolocation support received');
@@ -60,6 +58,5 @@ const onLocationSuccess = (position: GeolocationPosition) => {
 };
 
 const onLocationError = (err: GeolocationPositionError) => {
-	console.log('Error callback');
 	console.warn(`ERROR(${err.code}): ${err.message}`);
 };
