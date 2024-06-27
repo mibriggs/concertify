@@ -3,10 +3,12 @@
 	import { enhance } from '$app/forms';
 	import type { LayoutData } from './$types';
 	import { Toaster } from 'svelte-french-toast';
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { getGeoLocation } from '$lib';
 	import { Menu, X } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';  
 
 	export let data: LayoutData;
 
@@ -15,6 +17,30 @@
 	});
 
 	let showHamburgerMenu = false;
+	let menuRef: HTMLElement;
+	let currentUrl: string;
+
+	const handleClickOutside = (e: MouseEvent) => {
+		if (menuRef && !menuRef.contains(e.target as Node)) {
+			showHamburgerMenu = false;
+		}
+	};
+
+	onMount(() => {
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	});
+
+	beforeNavigate(() => {
+		currentUrl = $page.url.pathname;
+	});
+
+	afterNavigate(() => {
+		const newUrl = $page.url.pathname;
+		if (newUrl !== currentUrl) {
+			showHamburgerMenu = false;
+		}
+	});
 </script>
 
 <Toaster />
@@ -84,6 +110,7 @@
 			<div class="fixed left-0 top-14 w-full" id="navbar-hamburger" in:slide out:slide>
 				<ul
 					class="mt-4 flex flex-col rounded-lg bg-gray-200 font-medium dark:border-gray-700 dark:bg-gray-800"
+					bind:this={menuRef}
 				>
 					<li>
 						<a href="/" class="block rounded bg-spotigreen px-3 py-2 text-white" aria-current="page"
