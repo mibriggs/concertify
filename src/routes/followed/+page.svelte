@@ -7,7 +7,6 @@
 	import SearchBar from '$components/search-bar.svelte';
 
 	export let data: PageData;
-	export let form: ActionData;
 
 	const chunkSize = 12;
 	const chunks: Artist[][] = [];
@@ -21,14 +20,8 @@
 		}
 	}
 
-	const openModal = (currArtistIndex: number) => {
-		const modalId = `#modal${chunkIndex}${currArtistIndex}`;
-		const modal: HTMLDialogElement | null = document.querySelector(modalId);
-		modal?.showModal();
-	};
-
 	let currArtistIndex: number;
-	const openModalV2 = (artistIndex: number) => {
+	const openModal = (artistIndex: number) => {
 		currArtistIndex = artistIndex;
 		const modalId = '#modal';
 		const modal: HTMLDialogElement | null = document.querySelector(modalId);
@@ -77,15 +70,12 @@
 					popularity={artist.popularity}
 					genres={artist.genres}
 					followers={artist.followers.total}
-					on:click={() => openModalV2(indx)}
+					width={artist.images[0].width}
+					height={artist.images[0].height}
+					on:click={() => openModal(indx)}
 				/>
 			{/each}
-			<Modal
-				artist={chunks[chunkIndex][currArtistIndex]}
-				concertInfo={form?.concertInfo}
-				concertDate={form?.concertInfo ? 'April 14, 2024' : 'n/a'}
-				concertLocation={form?.concertInfo ? 'House of Blues' : 'n/a'}
-			/>
+			<Modal artist={chunks[chunkIndex][currArtistIndex]} />
 		</div>
 	</main>
 {/if}

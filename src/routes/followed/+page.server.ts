@@ -1,15 +1,12 @@
-import { redirect, type Cookies } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 import {
 	type AccessTokenWithDate,
 	type Artist,
 	type FollowedArtists,
-	followedArtistsSuccessReponseSchema,
-	concertEventSuccessSchema,
-	type Concert
+	followedArtistsSuccessReponseSchema
 } from '$lib/types';
-import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
-import { SPOTIFY_BASE_URL, TICKETMASTER_BASE_URL, constructQueryParams } from '$lib';
+import { SPOTIFY_BASE_URL } from '$lib';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.spotifyAccessTokens) {
@@ -55,52 +52,4 @@ const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Art
 	}
 
 	return followedArtists;
-};
-
-export const actions: Actions = {
-	getConcertInfo: async ({ request, cookies }) => {
-		const concertInfo = await _fetchConcertInfo(request, cookies);
-		if (concertInfo && concertInfo.page.totalElements === 0) {
-			return { concertInfo: undefined };
-		}
-		return { concertInfo: concertInfo };
-	}
-};
-
-export const _fetchConcertInfo = async (
-	request: Request,
-	cookies: Cookies
-): Promise<Concert | undefined> => {
-	const data = await request.formData();
-	const artistName: string = data.has('artist') ? (data.get('artist')?.toString() as string) : '';
-	const geoHashString = cookies.get('geoHash');
-
-	const queryParams: Record<string, string> = {
-		classificationName: 'music',
-		apikey: SECRET_TICKETMASTER_TOKEN,
-		keyword: artistName.toLowerCase(),
-		radius: '10',
-		unit: 'miles',
-		sort: 'date,asc'
-	};
-
-	if (geoHashString) {
-		queryParams.geoPoint = geoHashString;
-	}
-
-	const queryParamString: string = constructQueryParams(queryParams);
-	const fetchUrl: string = encodeURI(`${TICKETMASTER_BASE_URL}/events.json?${queryParamString}`);
-
-	const response = await fetch(fetchUrl);
-	if (response.ok) {
-		const data = (await response.json()) as unknown;
-		const maybeConcerts = concertEventSuccessSchema.safeParse(data);
-
-		if (maybeConcerts.success) {
-			const concertData = maybeConcerts.data;
-			return concertData;
-		} else {
-			console.log(maybeConcerts.error.errors);
-		}
-	}
 };

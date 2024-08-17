@@ -8,7 +8,7 @@
 	import { Menu, X } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';  
+	import { page } from '$app/stores';
 
 	export let data: LayoutData;
 

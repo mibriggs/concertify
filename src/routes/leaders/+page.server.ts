@@ -20,7 +20,7 @@ const getTop50SongsPlaylist = async (accessToken: AccessTokenWithDate) => {
 		if (maybePlaylistData.success) {
 			console.log(maybePlaylistData.data);
 		} else {
-			console.log(maybePlaylistData.error.errors);
+			console.error(maybePlaylistData.error.errors);
 		}
 	}
 };
