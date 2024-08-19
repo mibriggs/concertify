@@ -2,6 +2,7 @@
 	import { MapPinned, Calendar, X } from 'lucide-svelte';
 	import { concertEventSuccessSchema, type Artist, type Concert } from '../types';
 	import { onMount } from 'svelte';
+	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
 
 	export let artist: Artist;
 
@@ -32,12 +33,6 @@
 		modal?.close();
 	};
 
-	$: {
-		if (artist) {
-			fetchData();
-		}
-	}
-
 	const fetchData = async () => {
 		isLoading = true;
 		try {
@@ -50,9 +45,8 @@
 				if (maybeConcerts.success) {
 					const concertData: Concert = maybeConcerts.data;
 					concert = concertData;
-					// console.log(concert);
 				} else {
-					console.log(maybeConcerts.error.errors);
+					console.error(maybeConcerts.error.errors);
 				}
 			}
 		} catch (error) {
@@ -61,6 +55,12 @@
 			isLoading = false;
 		}
 	};
+
+	$: {
+		if (artist) {
+			fetchData();
+		}
+	}
 </script>
 
 <dialog
@@ -96,21 +96,34 @@
 				<div class="flex items-center gap-4 self-start p-4 text-sm md:text-base">
 					<span class="flex items-center justify-center gap-1">
 						<MapPinned />
-						<span>House of Blues</span>
+						<span>{concert._embedded?.events[0]._embedded.venues[0].name}</span>
 					</span>
 					<span class="flex items-center justify-center gap-1">
 						<Calendar />
-						<span>April 14, 2024</span>
+						<span>{makeDateHumanReadable(concert._embedded?.events[0].dates.start.localDate)}</span>
 					</span>
 				</div>
-				<div>Image goes here</div>
+				<img
+					src={concert._embedded?.events[0]._embedded.venues[0].images[0].url}
+					width={concert._embedded?.events[0]._embedded.venues[0].images[0].width}
+					height={concert._embedded?.events[0]._embedded.venues[0].images[0].height}
+					alt="Venue"
+				/>
 				<div class="self-start pl-4 font-semibold">About Event</div>
+				<ul class=" self-start pl-4">
+					<li>Address: {concert._embedded?.events[0]._embedded.venues[0].address.line1}</li>
+					<li>Doors Open: {convertTo12HourFormat(concert._embedded?.events[0].dates.start.localTime)}</li>
+				</ul>
 				<div class="self-start pl-4 font-semibold">Ticket Choices</div>
-				<button class="mx-4 w-fit self-end rounded-lg bg-spotigreen px-4 py-1 disabled:bg-gray-400">
+				<a
+					class="mx-4 w-fit self-end rounded-lg bg-spotigreen px-4 py-1 disabled:bg-gray-400"
+					href={concert._embedded?.events[0].url}
+					target="_blank"
+				>
 					Buy Tickets
-				</button>
+				</a>
 			{:else}
-				<div class="italic">No upcoming concerts in your area</div>
+				<div class="italic text-center">No upcoming concerts found in your area</div>
 			{/if}
 		{/if}
 	</div>

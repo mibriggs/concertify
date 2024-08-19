@@ -2,8 +2,7 @@ import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
 import { constructQueryParams, TICKETMASTER_BASE_URL } from '$lib';
 import { json } from '@sveltejs/kit';
 
-export const GET = async ({ url, cookies, request }) => {
-    const requestHost = request.headers.get("host");
+export const GET = async ({ url, cookies }) => {
 	const artistName = url.searchParams.has('artist')
 		? (url.searchParams.get('artist') as string)
 		: '';

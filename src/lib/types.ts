@@ -228,6 +228,93 @@ const getShowPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
 	items: podacastPlaylistTrackSchema.array()
 });
 
+const zoneSchema = z.object({
+	fixed: z.boolean(),
+	id: z.string()
+});
+
+const chronologySchema = z.object({
+	zone: zoneSchema
+});
+
+const concertDateValueSchema = z.object({
+	type: z.number(),
+	format: z.number()
+});
+
+const concertDateFieldTypesSchema = z.object({
+	name: z.string(),
+	rangeDurationType: z.object({
+		name: z.string()
+	}),
+	durationType: z.object({
+		name: z.string()
+	})
+});
+
+const concertDateFieldsSchema = z.object({
+	lenient: z.boolean(),
+	minimumValue: z.number(),
+	maximumValue: z.number(),
+	name: z.string(),
+	supported: z.boolean(),
+	type: concertDateFieldTypesSchema,
+	leapDurationField: z.object({
+		unitMillis: z.number(),
+		precise: z.boolean(),
+		name: z.string(),
+		type: z.object({ name: z.string() }),
+		supported: z.boolean()
+	}),
+	durationField: z.object({
+		unitMillis: z.number(),
+		precise: z.boolean(),
+		name: z.string(),
+		supported: z.boolean(),
+		type: z.object({ name: z.string() })
+	}),
+	rangeDurationField: z.object({
+		unitMillis: z.number(),
+		precise: z.boolean(),
+		name: z.string(),
+		supported: z.boolean(),
+		type: z.object({ name: z.string() })
+	})
+});
+
+const concertBaseDateSchema = z.object({
+	localDate: z.string(),
+	localTime: z.string(),
+	dateTime: z.string(),
+	noSpecificTime: z.boolean()
+});
+
+const concertStartDateSchema = concertBaseDateSchema.extend({
+	dateTBD: z.boolean(),
+	dateTBA: z.boolean(),
+	timeTBA: z.boolean()
+});
+
+const concertEndDateSchema = concertBaseDateSchema.extend({
+	approximate: z.boolean()
+});
+
+const concertDateSchema = z.object({
+	start: concertStartDateSchema,
+	end: concertEndDateSchema.optional(),
+	timezone: z.string(),
+	spanMultipleDays: z.boolean(),
+	status: z.object({ code: z.enum(['onsale', 'offsale', 'canceled', 'postponed', 'rescheduled']) }),
+	access: z
+		.object({
+			startDateTime: z.string(),
+			startApproximate: z.boolean(),
+			endDateTime: z.string(),
+			endApproximate: z.boolean()
+		})
+		.optional()
+});
+
 const concertEventSuccessSchema = z.object({
 	_embedded: z
 		.object({
@@ -247,7 +334,27 @@ const concertEventSuccessSchema = z.object({
 							height: z.number(),
 							fallback: z.boolean()
 						})
-						.array()
+						.array(),
+					dates: concertDateSchema,
+					_embedded: z.object({
+						venues: z
+							.object({
+								name: z.string(),
+								address: z.object({
+									line1: z.string()
+								}),
+								images: z
+									.object({
+										ratio: z.string(),
+										url: z.string(),
+										width: z.number(),
+										height: z.number(),
+										fallback: z.boolean()
+									})
+									.array()
+							})
+							.array()
+					})
 				})
 				.array()
 		})
