@@ -30,17 +30,17 @@
 
 	const nextPage = () => {
 		chunkIndex += 1;
-		scrollToElement();
-	}
+		scrollToTopOfPage();
+	};
 
 	const prevPage = () => {
 		chunkIndex -= 1;
-		scrollToElement();
-	}
+		scrollToTopOfPage();
+	};
 
-	const scrollToElement = () => {
-        window.scrollTo({top: 0, behavior: "smooth"});
-    };
+	const scrollToTopOfPage = () => {
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	};
 
 	$: isOnFirstPage = chunkIndex === 0;
 	$: isOnLastPage = chunkIndex === chunks.length - 1;

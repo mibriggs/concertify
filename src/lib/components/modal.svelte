@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { MapPinned, Calendar, X } from 'lucide-svelte';
 	import { concertEventSuccessSchema, type Artist, type Concert } from '../types';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
 
 	export let artist: Artist;
@@ -34,6 +34,7 @@
 	};
 
 	const fetchData = async () => {
+		await tick();
 		isLoading = true;
 		try {
 			const res = await fetch(`/api/concert?artist=${artist.name}`);
@@ -56,11 +57,7 @@
 		}
 	};
 
-	$: {
-		if (artist) {
-			fetchData();
-		}
-	}
+	$: if (artist) fetchData();
 </script>
 
 <dialog
@@ -104,15 +101,17 @@
 					</span>
 				</div>
 				<img
-					src={concert._embedded?.events[0]._embedded.venues[0].images[0].url}
-					width={concert._embedded?.events[0]._embedded.venues[0].images[0].width}
-					height={concert._embedded?.events[0]._embedded.venues[0].images[0].height}
+					src={concert._embedded?.events[0]._embedded.venues[0].images?.at(0)?.url}
+					width={concert._embedded?.events[0]._embedded.venues[0].images?.at(0)?.width}
+					height={concert._embedded?.events[0]._embedded.venues[0].images?.at(0)?.height}
 					alt="Venue"
 				/>
 				<div class="self-start pl-4 font-semibold">About Event</div>
 				<ul class=" self-start pl-4">
 					<li>Address: {concert._embedded?.events[0]._embedded.venues[0].address.line1}</li>
-					<li>Doors Open: {convertTo12HourFormat(concert._embedded?.events[0].dates.start.localTime)}</li>
+					<li>
+						Doors Open: {convertTo12HourFormat(concert._embedded?.events[0].dates.start.localTime)}
+					</li>
 				</ul>
 				<div class="self-start pl-4 font-semibold">Ticket Choices</div>
 				<a
@@ -123,7 +122,7 @@
 					Buy Tickets
 				</a>
 			{:else}
-				<div class="italic text-center">No upcoming concerts found in your area</div>
+				<div class="text-center italic">No upcoming concerts found in your area</div>
 			{/if}
 		{/if}
 	</div>

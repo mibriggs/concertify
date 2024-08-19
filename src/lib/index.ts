@@ -62,27 +62,26 @@ const onLocationError = (err: GeolocationPositionError) => {
 };
 
 export const convertTo12HourFormat = (time24: string | undefined) => {
-	if (!time24) return "";
-    const [hours24, minutes] = time24.split(':').map(Number);
-    let period = 'AM';
-    let hours12 = hours24;
+	if (!time24) return '';
+	const [hours24, minutes] = time24.split(':').map(Number);
+	let period = 'AM';
+	let hours12 = hours24;
 
-    if (hours24 === 0) {
-        hours12 = 12; // Midnight case
-    } else if (hours24 >= 12) {
-        period = 'PM';
-        if (hours24 > 12) {
-            hours12 = hours24 - 12;
-        }
-    }
-    
-    if (hours24 === 12) {
-        period = 'PM'; // Noon case
-    }
+	if (hours24 === 0) {
+		hours12 = 12; // Midnight case
+	} else if (hours24 >= 12) {
+		period = 'PM';
+		if (hours24 > 12) {
+			hours12 = hours24 - 12;
+		}
+	}
 
-    return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+	if (hours24 === 12) {
+		period = 'PM'; // Noon case
+	}
+
+	return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
 };
-
 
 export const makeDateHumanReadable = (oldDateFormat: string | undefined) => {
 	if (!oldDateFormat) return '';

@@ -25,16 +25,6 @@ const externalIdsSchema = z.object({
 	upc: z.string()
 });
 
-const resumePointSchema = z.object({
-	fully_played: z.boolean(),
-	resume_position_ms: z.number()
-});
-
-const copyrightSchema = z.object({
-	text: z.string(),
-	type: z.string()
-});
-
 const simpleArtistSchema = z.object({
 	external_urls: externalUrlSchema,
 	href: z.string(),
@@ -83,26 +73,6 @@ const albumSchema = z.object({
 	artists: simpleArtistSchema.array()
 });
 
-const showSchema = z.object({
-	available_markets: z.string().array(),
-	copyrights: copyrightSchema.array(),
-	description: z.string(),
-	html_description: z.string(),
-	explicit: z.boolean(),
-	external_urls: externalUrlSchema,
-	href: z.string(),
-	id: z.string(),
-	images: imageSchema.array(),
-	is_externally_hosted: z.boolean(),
-	languages: z.string().array(),
-	media_type: z.string(),
-	name: z.string(),
-	publisher: z.string(),
-	type: z.string(),
-	uri: z.string(),
-	total_episodes: z.number()
-});
-
 const trackSchema = z.object({
 	album: albumSchema,
 	artists: artistSchema.array(),
@@ -126,37 +96,10 @@ const trackSchema = z.object({
 	is_local: z.boolean()
 });
 
-const episodeSchema = z.object({
-	audio_preview_url: z.string().nullable(),
-	description: z.string(),
-	html_description: z.string(),
-	duration_ms: z.number(),
-	explicit: z.boolean(),
-	external_urls: externalUrlSchema,
-	href: z.string(),
-	id: z.string(),
-	images: imageSchema.array(),
-	is_externally_hosted: z.boolean(),
-	is_playable: z.boolean(),
-	languages: z.string().array(),
-	name: z.string(),
-	release_date: z.string(),
-	release_date_precision: z.string(),
-	resume_point: resumePointSchema,
-	type: z.literal('episode'),
-	uri: z.string(),
-	restrictions: restrictionsSchema,
-	show: showSchema
-});
-
 const playlistTrackSchema = z.object({
 	added_at: z.string().datetime(),
 	added_by: userSchema.nullable(),
 	is_local: z.boolean()
-});
-
-const podacastPlaylistTrackSchema = playlistTrackSchema.extend({
-	track: episodeSchema
 });
 
 const songPlaylistTrackSchema = playlistTrackSchema.extend({
@@ -224,64 +167,6 @@ const getSongPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
 	items: songPlaylistTrackSchema.array()
 });
 
-const getShowPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
-	items: podacastPlaylistTrackSchema.array()
-});
-
-const zoneSchema = z.object({
-	fixed: z.boolean(),
-	id: z.string()
-});
-
-const chronologySchema = z.object({
-	zone: zoneSchema
-});
-
-const concertDateValueSchema = z.object({
-	type: z.number(),
-	format: z.number()
-});
-
-const concertDateFieldTypesSchema = z.object({
-	name: z.string(),
-	rangeDurationType: z.object({
-		name: z.string()
-	}),
-	durationType: z.object({
-		name: z.string()
-	})
-});
-
-const concertDateFieldsSchema = z.object({
-	lenient: z.boolean(),
-	minimumValue: z.number(),
-	maximumValue: z.number(),
-	name: z.string(),
-	supported: z.boolean(),
-	type: concertDateFieldTypesSchema,
-	leapDurationField: z.object({
-		unitMillis: z.number(),
-		precise: z.boolean(),
-		name: z.string(),
-		type: z.object({ name: z.string() }),
-		supported: z.boolean()
-	}),
-	durationField: z.object({
-		unitMillis: z.number(),
-		precise: z.boolean(),
-		name: z.string(),
-		supported: z.boolean(),
-		type: z.object({ name: z.string() })
-	}),
-	rangeDurationField: z.object({
-		unitMillis: z.number(),
-		precise: z.boolean(),
-		name: z.string(),
-		supported: z.boolean(),
-		type: z.object({ name: z.string() })
-	})
-});
-
 const concertBaseDateSchema = z.object({
 	localDate: z.string(),
 	localTime: z.string(),
@@ -302,7 +187,6 @@ const concertEndDateSchema = concertBaseDateSchema.extend({
 const concertDateSchema = z.object({
 	start: concertStartDateSchema,
 	end: concertEndDateSchema.optional(),
-	timezone: z.string(),
 	spanMultipleDays: z.boolean(),
 	status: z.object({ code: z.enum(['onsale', 'offsale', 'canceled', 'postponed', 'rescheduled']) }),
 	access: z
@@ -328,7 +212,6 @@ const concertEventSuccessSchema = z.object({
 					locale: z.string(),
 					images: z
 						.object({
-							ratio: z.string(),
 							url: z.string(),
 							width: z.number(),
 							height: z.number(),
@@ -352,6 +235,7 @@ const concertEventSuccessSchema = z.object({
 										fallback: z.boolean()
 									})
 									.array()
+									.optional()
 							})
 							.array()
 					})
