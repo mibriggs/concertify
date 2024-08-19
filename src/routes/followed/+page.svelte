@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Artist } from '$lib/types';
-	import type { ActionData, PageData } from './$types';
+	import type { PageData } from './$types';
 	import Modal from '$components/modal.svelte';
 	import ArtistCard from '$components/artist-card.svelte';
 	import Button from '$components/button.svelte';
@@ -28,6 +28,20 @@
 		modal?.showModal();
 	};
 
+	const nextPage = () => {
+		chunkIndex += 1;
+		scrollToElement();
+	}
+
+	const prevPage = () => {
+		chunkIndex -= 1;
+		scrollToElement();
+	}
+
+	const scrollToElement = () => {
+        window.scrollTo({top: 0, behavior: "smooth"});
+    };
+
 	$: isOnFirstPage = chunkIndex === 0;
 	$: isOnLastPage = chunkIndex === chunks.length - 1;
 </script>
@@ -42,8 +56,8 @@
 					<SearchBar placeholder="Search artists..." bind:value={searchValue} />
 				</div>
 				<div class="flex gap-4 pr-6">
-					<Button disabled={isOnFirstPage} on:click={() => (chunkIndex -= 1)}>Previous</Button>
-					<Button disabled={isOnLastPage} on:click={() => (chunkIndex += 1)}>Next</Button>
+					<Button disabled={isOnFirstPage} on:click={prevPage}>Previous</Button>
+					<Button disabled={isOnLastPage} on:click={nextPage}>Next</Button>
 				</div>
 			</div>
 
@@ -52,8 +66,8 @@
 				<div class="flex w-full items-center justify-between gap-2">
 					<span class="sm:text-md text-sm font-bold md:text-xl">Artists you Follow</span>
 					<div class="flex gap-4">
-						<Button disabled={isOnFirstPage} on:click={() => (chunkIndex -= 1)}>Previous</Button>
-						<Button disabled={isOnLastPage} on:click={() => (chunkIndex += 1)}>Next</Button>
+						<Button disabled={isOnFirstPage} on:click={prevPage}>Previous</Button>
+						<Button disabled={isOnLastPage} on:click={nextPage}>Next</Button>
 					</div>
 				</div>
 				<div class="w-full">
