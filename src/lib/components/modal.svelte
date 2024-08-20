@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { MapPinned, Calendar, X } from 'lucide-svelte';
 	import { concertEventSuccessSchema, type Artist, type Concert } from '../types';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
 
 	export let artist: Artist;
@@ -34,22 +34,11 @@
 	};
 
 	const fetchData = async () => {
-		await tick();
 		isLoading = true;
 		try {
-			const res = await fetch(`/api/concert?artist=${artist.name}`);
-
-			if (res.ok) {
-				const data = (await res.json()) as unknown;
-				const maybeConcerts = concertEventSuccessSchema.safeParse(data);
-
-				if (maybeConcerts.success) {
-					const concertData: Concert = maybeConcerts.data;
-					concert = concertData;
-				} else {
-					console.error(maybeConcerts.error.errors);
-				}
-			}
+			const res = await fetch(`/api/concert?artist=${encodeURIComponent(artist.name)}`);
+			const data = (await res.json()) as unknown;
+			concert = concertEventSuccessSchema.parse(data);
 		} catch (error) {
 			console.error(error);
 		} finally {

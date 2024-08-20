@@ -1,9 +1,4 @@
-import { dev } from '$app/environment';
 import { encodeBase32 } from 'geohashing';
-
-export const baseRedirectUrl: string = dev
-	? 'http://localhost:3000'
-	: 'https://myconcertify.vercel.app';
 
 export const SPOTIFY_BASE_URL = 'https://api.spotify.com/v1';
 export const TICKETMASTER_BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
