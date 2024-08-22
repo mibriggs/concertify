@@ -121,11 +121,11 @@ const refreshTokenSuccessResponseSchema = z.object({
 	expires_in: z.number()
 });
 
-export const accessTokenSchema = accessTokenSuccessResponseSchema.extend({
+const accessTokenSchema = accessTokenSuccessResponseSchema.extend({
 	createdAt: z.string().transform((val) => new Date(val))
 });
 
-export const followedArtistsSuccessReponseSchema = z.object({
+const followedArtistsSuccessReponseSchema = z.object({
 	artists: z.object({
 		href: z.string(),
 		limit: z.number(),
@@ -139,7 +139,7 @@ export const followedArtistsSuccessReponseSchema = z.object({
 	})
 });
 
-export const savedTracksSuccessResponseSchema = z.object({
+const savedTracksSuccessResponseSchema = z.object({
 	href: z.string(),
 	limit: z.number(),
 	next: z.string().nullable(),
@@ -256,6 +256,31 @@ const concertEventSuccessSchema = z.object({
 	})
 });
 
+const top50SongsSchema = z.object({
+	href: z.string(),
+	limit: z.number(),
+	next: z.string().nullable(),
+	offset: z.number(),
+	previous: z.string().nullable(),
+	total: z.number(),
+	items: z
+		.object({
+			track: z.object({
+				artists: z
+					.object({
+						id: z.string(),
+						name: z.string()
+					})
+					.array()
+			})
+		})
+		.array()
+});
+
+const severalArtistsSchema = z.object({
+	artists: artistSchema.array()
+});
+
 export type SpotifyAccessTokenBody = {
 	grant_type: 'authorization_code';
 	code: string;
@@ -282,7 +307,12 @@ export {
 	accessTokenSuccessResponseSchema,
 	refreshTokenSuccessResponseSchema,
 	getSongPlaylistSuccessResponseSchema,
-	concertEventSuccessSchema
+	concertEventSuccessSchema,
+	accessTokenSchema,
+	followedArtistsSuccessReponseSchema,
+	top50SongsSchema,
+	savedTracksSuccessResponseSchema,
+	severalArtistsSchema
 };
 export type FollowedArtists = z.infer<typeof followedArtistsSuccessReponseSchema>;
 export type Artist = z.infer<typeof artistSchema>;

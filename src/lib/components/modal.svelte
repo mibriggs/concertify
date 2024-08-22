@@ -6,14 +6,13 @@
 
 	export let artist: Artist;
 
-	let modal: HTMLDialogElement | null;
+	let modal: HTMLDialogElement;
 	let isClosing: boolean = false;
 	let isLoading: boolean = false;
 	let concert: Concert;
 
 	onMount(() => {
-		modal = document.querySelector('#modal');
-		modal?.addEventListener('click', closeWithOutsideTap);
+		modal.addEventListener('click', closeWithOutsideTap);
 	});
 
 	const closeWithOutsideTap = (event: MouseEvent) => {
@@ -25,12 +24,12 @@
 
 	const closeModal = () => {
 		isClosing = true;
-		modal?.addEventListener('animationend', closeModalHelper, { once: true });
+		modal.addEventListener('animationend', closeModalHelper, { once: true });
 	};
 
 	const closeModalHelper = () => {
 		isClosing = false;
-		modal?.close();
+		modal.close();
 	};
 
 	const fetchData = async () => {
@@ -52,7 +51,8 @@
 <dialog
 	id="modal"
 	class="h-fit w-11/12 max-w-[560px] rounded-xl border-2 border-gray-400 bg-stone-200 text-spotiblack shadow-lg backdrop:bg-spotiblack backdrop:bg-opacity-70 backdrop:backdrop-blur-md md:w-2/3 lg:w-1/2"
-	data-closing={isClosing ? 'true' : null}
+	data-closing={isClosing ? 'true' : 'false'}
+	bind:this={modal}
 >
 	<div
 		class="flex w-full flex-col items-center justify-center break-words py-4 font-mono md:text-lg"
@@ -152,7 +152,7 @@
 	}
 
 	#modal[open] {
-		animation: slide-up 350ms forwards, fade-in 650ms forwards;
+		animation: slide-up 350ms forwards, fade-in 350ms forwards;
 	}
 
 	#modal[data-closing='true'] {
