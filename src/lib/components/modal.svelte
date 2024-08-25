@@ -5,6 +5,7 @@
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
 
 	export let artist: Artist;
+	export let radius: number;
 
 	let modal: HTMLDialogElement;
 	let isClosing: boolean = false;
@@ -35,7 +36,9 @@
 	const fetchData = async () => {
 		isLoading = true;
 		try {
-			const res = await fetch(`/api/concert?artist=${encodeURIComponent(artist.name)}`);
+			const res = await fetch(
+				`/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${radius}`
+			);
 			const data = (await res.json()) as unknown;
 			concert = concertEventSuccessSchema.parse(data);
 		} catch (error) {
@@ -45,7 +48,7 @@
 		}
 	};
 
-	$: if (artist) fetchData();
+	$: if (artist || radius) fetchData();
 </script>
 
 <dialog

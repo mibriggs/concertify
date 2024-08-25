@@ -6,13 +6,14 @@ export const GET = async ({ url, cookies }) => {
 	const artistName = url.searchParams.has('artist')
 		? (url.searchParams.get('artist') as string)
 		: '';
+	const radius = url.searchParams.has('radius') ? (url.searchParams.get('radius') as string) : '10';
 	const geoHashString = cookies.get('geoHash');
 
 	const queryParams: Record<string, string> = {
 		classificationName: 'music',
 		apikey: SECRET_TICKETMASTER_TOKEN,
 		keyword: artistName.toLowerCase(),
-		radius: '10',
+		radius,
 		unit: 'miles',
 		sort: 'date,asc'
 	};

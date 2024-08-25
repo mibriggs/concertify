@@ -8,10 +8,14 @@
 
 	export let artists: Artist[];
 	export let label: string;
+
 	const chunkSize = 12;
 	const chunks: Artist[][] = [];
+
 	let chunkIndex = 0;
 	let searchValue: string = '';
+	let isOpen: boolean = false;
+	let sliderVal: number = 5;
 
 	for (let i = 0; i < artists.length; i += chunkSize) {
 		const chunk = artists.slice(i, i + chunkSize);
@@ -86,12 +90,110 @@
 				on:click={() => openModal(indx)}
 			/>
 		{/each}
-		<Modal artist={chunks[chunkIndex][currArtistIndex]} />
+		<Modal artist={chunks[chunkIndex][currArtistIndex]} radius={sliderVal} />
 	</div>
 
-	<button
-		class="sticky bottom-4 m-4 flex size-11 items-center justify-center self-end rounded-full bg-spotigreen shadow-lg hover:opacity-80 md:size-14"
-	>
-		<Locate />
-	</button>
+	<div class="sticky bottom-4 m-4 flex flex-col items-end justify-center gap-2">
+		<div
+			class:hide={!isOpen}
+			class="flex w-11/12 flex-col gap-3 rounded-lg bg-white p-3 text-start text-spotiblack shadow-lg md:w-[33%]"
+		>
+			<span>
+				<label for="city" class="italic">City:</label>
+				<input type="text" id="city" name="city" class="outline-slate-300 border-2 rounded-md" />
+			</span>
+			<span class="flex flex-col gap-2">
+				<label for="radius" class="italic">Search Radius: {sliderVal} miles</label>
+				<input
+					type="range"
+					min="5"
+					max="50"
+					step="5"
+					id="radius"
+					name="radius"
+					bind:value={sliderVal}
+				/>
+			</span>
+		</div>
+		<button
+			class="flex size-11 items-center justify-center rounded-full bg-spotigreen shadow-lg active:opacity-80 md:size-14"
+			on:click={() => (isOpen = !isOpen)}
+		>
+			<Locate />
+		</button>
+	</div>
 </main>
+
+<style lang="postcss">
+	.hide {
+		visibility: hidden;
+	}
+
+	/* Getting rid of base range styling */
+	input[type='range'] {
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		background: transparent;
+		cursor: pointer;
+		outline: none;
+	}
+
+	/* Webkit styling (AKA Chrome, Safari, and Edge) */
+	input[type='range']::-webkit-slider-runnable-track {
+		-webkit-appearance: none;
+		height: 20px;
+		border-radius: 16px;
+		@apply bg-stone-300;
+	}
+	input[type='range']::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		height: 32px;
+		width: 32px;
+		background: #fcf7f8;
+		margin-top: -6px;
+		border: solid;
+		border-radius: 9999px;
+		border-width: 2px;
+		border-color: #332e3c;
+	}
+
+	/* Firefox Styling */
+	input[type='range']::-moz-range-track {
+		-moz-appearance: none;
+		background: #e7ebe4;
+		height: 20px;
+		border-radius: 16px;
+	}
+
+	input[type='range']::-moz-range-thumb {
+		-moz-appearance: none;
+		appearance: none;
+		height: 32px;
+		width: 32px;
+		border: solid;
+		border-radius: 9999px;
+		border-width: 2px;
+		border-color: #332e3c;
+		@apply bg-stone-300;
+	}
+
+	/* Styling for idek what */
+	input[type='range']::-ms-track {
+		appearance: none;
+		background: #e7ebe4;
+		height: 20px;
+		border-radius: 16px;
+	}
+	input[type='range']::-ms-thumb {
+		appearance: none;
+		height: 32px;
+		width: 32px;
+		background: #fcf7f8;
+		border: solid;
+		border-radius: 9999px;
+		border-width: 2px;
+		border-color: #332e3c;
+	}
+</style>
