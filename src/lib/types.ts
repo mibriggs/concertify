@@ -168,9 +168,9 @@ const getSongPlaylistSuccessResponseSchema = basePlaylistResponseSchema.extend({
 });
 
 const concertBaseDateSchema = z.object({
-	localDate: z.string(),
-	localTime: z.string(),
-	dateTime: z.string(),
+	localDate: z.string().optional(),
+	localTime: z.string().optional(),
+	dateTime: z.string().optional(),
 	noSpecificTime: z.boolean()
 });
 
@@ -180,20 +180,15 @@ const concertStartDateSchema = concertBaseDateSchema.extend({
 	timeTBA: z.boolean()
 });
 
-const concertEndDateSchema = concertBaseDateSchema.extend({
-	approximate: z.boolean()
-});
-
 const concertDateSchema = z.object({
 	start: concertStartDateSchema,
-	end: concertEndDateSchema.optional(),
 	spanMultipleDays: z.boolean(),
 	status: z.object({ code: z.enum(['onsale', 'offsale', 'canceled', 'postponed', 'rescheduled']) }),
 	access: z
 		.object({
 			startDateTime: z.string(),
 			startApproximate: z.boolean(),
-			endDateTime: z.string(),
+			endDateTime: z.string().optional(),
 			endApproximate: z.boolean()
 		})
 		.optional()

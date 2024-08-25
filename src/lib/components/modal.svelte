@@ -34,6 +34,7 @@
 	};
 
 	const fetchData = async () => {
+		if (!artist) return;
 		isLoading = true;
 		try {
 			const res = await fetch(
