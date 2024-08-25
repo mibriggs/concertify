@@ -4,6 +4,7 @@
 	import ArtistCard from '$components/artist-card.svelte';
 	import Button from '$components/button.svelte';
 	import SearchBar from '$components/search-bar.svelte';
+	import { Locate } from 'lucide-svelte';
 
 	export let artists: Artist[];
 	export let label: string;
@@ -87,4 +88,10 @@
 		{/each}
 		<Modal artist={chunks[chunkIndex][currArtistIndex]} />
 	</div>
+
+	<button
+		class="sticky bottom-4 m-4 flex size-11 items-center justify-center self-end rounded-full bg-spotigreen shadow-lg hover:opacity-80 md:size-14"
+	>
+		<Locate />
+	</button>
 </main>

@@ -1,9 +1,17 @@
-import { type AccessTokenWithDate, type Artist, severalArtistsSchema, top50SongsSchema } from '$lib/types';
+import {
+	type AccessTokenWithDate,
+	type Artist,
+	severalArtistsSchema,
+	top50SongsSchema
+} from '$lib/types';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { SPOTIFY_BASE_URL } from '$lib';
 
-const getTop50SongsArtists = async (accessToken: AccessTokenWithDate, artistIds: string[]): Promise<Artist[] | undefined> => {
+const getTop50SongsArtists = async (
+	accessToken: AccessTokenWithDate,
+	artistIds: string[]
+): Promise<Artist[] | undefined> => {
 	const artistIdsSet = new Set(artistIds);
 	const ids = Array.from(artistIdsSet).join(',');
 	const fetchUrl = `${SPOTIFY_BASE_URL}/artists?ids=${ids}`;
@@ -57,5 +65,5 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
-	return {artists: await getTop50SongsPlaylist(accessToken)};
+	return { artists: await getTop50SongsPlaylist(accessToken) };
 };

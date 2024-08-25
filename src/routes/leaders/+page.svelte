@@ -3,7 +3,6 @@
 	import ArtistGallery from '$components/artist-gallery.svelte';
 
 	export let data: PageData;
-
 </script>
 
 {#if data.artists}
