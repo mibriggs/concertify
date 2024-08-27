@@ -3,9 +3,9 @@
 	import { concertEventSuccessSchema, type Artist, type Concert } from '../types';
 	import { onMount } from 'svelte';
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
+	import { radiusStore } from '$lib/stores/store';
 
 	export let artist: Artist;
-	export let radius: number;
 
 	let modal: HTMLDialogElement;
 	let isClosing: boolean = false;
@@ -38,7 +38,7 @@
 		isLoading = true;
 		try {
 			const res = await fetch(
-				`/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${radius}`
+				`/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${$radiusStore}`
 			);
 			const data = (await res.json()) as unknown;
 			concert = concertEventSuccessSchema.parse(data);
@@ -49,7 +49,7 @@
 		}
 	};
 
-	$: if (artist || radius) fetchData();
+	$: if (artist) fetchData();
 </script>
 
 <dialog

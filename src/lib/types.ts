@@ -276,6 +276,33 @@ const severalArtistsSchema = z.object({
 	artists: artistSchema.array()
 });
 
+const suggestionSchema = z.object({
+	name: z.string(),
+	mapbox_id: z.string(),
+	address: z.string().optional(),
+	full_address: z.string().optional(),
+	place_formatted: z.string()
+});
+
+const mapboxAutomcompleteSchema = z.object({
+	suggestions: suggestionSchema.array(),
+	attribution: z.string(),
+	response_id: z.string()
+});
+
+const mapboxRetrieveSchema = z.object({
+	type: z.string(),
+	attribution: z.string(),
+	features: z
+		.object({
+			geometry: z.object({
+				type: z.string(),
+				coordinates: z.number().array().length(2) // [longitude,latitude]
+			})
+		})
+		.array()
+});
+
 export type SpotifyAccessTokenBody = {
 	grant_type: 'authorization_code';
 	code: string;
@@ -307,7 +334,9 @@ export {
 	followedArtistsSuccessReponseSchema,
 	top50SongsSchema,
 	savedTracksSuccessResponseSchema,
-	severalArtistsSchema
+	severalArtistsSchema,
+	mapboxAutomcompleteSchema,
+	mapboxRetrieveSchema
 };
 export type FollowedArtists = z.infer<typeof followedArtistsSuccessReponseSchema>;
 export type Artist = z.infer<typeof artistSchema>;
@@ -316,3 +345,6 @@ export type RefreshTokens = z.infer<typeof refreshTokenSuccessResponseSchema>;
 export type AccessTokenWithDate = z.infer<typeof accessTokenSchema>;
 export type SongPlaylist = z.infer<typeof getSongPlaylistSuccessResponseSchema>;
 export type Concert = z.infer<typeof concertEventSuccessSchema>;
+export type MapBoxAutocompleteOptions = z.infer<typeof mapboxAutomcompleteSchema>;
+export type Suggestion = z.infer<typeof suggestionSchema>;
+export type MapBoxGeoJson = z.infer<typeof mapboxRetrieveSchema>;

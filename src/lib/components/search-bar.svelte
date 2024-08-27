@@ -13,7 +13,7 @@
 </script>
 
 <div
-	class="flex w-full items-center justify-between rounded-xl bg-stone-300 bg-search bg-left-center bg-no-repeat py-2 pl-12 text-spotiblack outline-none"
+	class="flex w-full items-center justify-between rounded-lg bg-stone-300 bg-search bg-left-center bg-no-repeat py-2 pl-12 text-spotiblack outline-none"
 >
 	<input
 		id="search"
