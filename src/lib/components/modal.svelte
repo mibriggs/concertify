@@ -1,16 +1,20 @@
 <script lang="ts">
 	import { MapPinned, Calendar, X } from 'lucide-svelte';
 	import { concertEventSuccessSchema, type Artist, type Concert } from '../types';
-	import { onMount } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
 	import { radiusStore } from '$lib/stores/store';
 
 	export let artist: Artist;
+	export let isModalOpen: boolean;
 
 	let modal: HTMLDialogElement;
 	let isClosing: boolean = false;
 	let isLoading: boolean = false;
 	let concert: Concert;
+
+	const dispatch = createEventDispatcher();
+
 
 	onMount(() => {
 		modal.addEventListener('click', closeWithOutsideTap);
@@ -26,6 +30,7 @@
 	const closeModal = () => {
 		isClosing = true;
 		modal.addEventListener('animationend', closeModalHelper, { once: true });
+		dispatch('closeModal');
 	};
 
 	const closeModalHelper = () => {
@@ -35,6 +40,7 @@
 
 	const fetchData = async () => {
 		if (!artist) return;
+		console.log("in the actual fetch function");
 		isLoading = true;
 		try {
 			const res = await fetch(
@@ -49,7 +55,7 @@
 		}
 	};
 
-	$: if (artist) fetchData();
+	$: if (isModalOpen) fetchData();
 </script>
 
 <dialog

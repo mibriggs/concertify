@@ -19,6 +19,7 @@
 		id="search"
 		type="text"
 		class="w-full bg-inherit outline-none"
+		on:input
 		{placeholder}
 		bind:value
 		bind:this={searchBarElement}

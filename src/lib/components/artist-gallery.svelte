@@ -25,6 +25,7 @@
 	let searchValue: string = '';
 	let locationSearchValue: string = '';
 	let isOpen: boolean = false;
+	let isModalOpen: boolean = false;
 	let mapboxSuggestions: Suggestion[] = [];
 
 	for (let i = 0; i < artists.length; i += chunkSize) {
@@ -34,6 +35,7 @@
 
 	const openModal = (artistIndex: number) => {
 		currArtistIndex = artistIndex;
+		isModalOpen = true;
 		const modalId = '#modal';
 		const modal: HTMLDialogElement | null = document.querySelector(modalId);
 		modal?.showModal();
@@ -53,25 +55,25 @@
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	};
 
-	const getAutoCompleteOptions = (e: Event & { currentTarget: EventTarget & HTMLInputElement }) => {
-		const value = e.currentTarget.value;
-		console.log(value);
-		clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(async () => {
-			try {
-				if (value === '') {
-					mapboxSuggestions = [];
-					return;
-				}
-				const res = await fetch(`/api/autocomplete?searchValue=${encodeURIComponent(value)}`);
-				const data = (await res.json()) as unknown;
-				console.log(data);
-				const options: MapBoxAutocompleteOptions = mapboxAutomcompleteSchema.parse(data);
-				mapboxSuggestions = options.suggestions;
-			} catch (error) {
-				console.error(error);
-			}
-		}, 500);
+	const getAutoCompleteOptions = (e: Event) => {
+		console.log(locationSearchValue);
+		// console.log(value);
+		// clearTimeout(debounceTimer);
+		// debounceTimer = setTimeout(async () => {
+		// 	try {
+		// 		if (value === '') {
+		// 			mapboxSuggestions = [];
+		// 			return;
+		// 		}
+		// 		const res = await fetch(`/api/autocomplete?searchValue=${encodeURIComponent(value)}`);
+		// 		const data = (await res.json()) as unknown;
+		// 		console.log(data);
+		// 		const options: MapBoxAutocompleteOptions = mapboxAutomcompleteSchema.parse(data);
+		// 		mapboxSuggestions = options.suggestions;
+		// 	} catch (error) {
+		// 		console.error(error);
+		// 	}
+		// }, 500);
 	};
 
 	const retrieveLocation = async (mapboxId: string, name: string) => {
@@ -134,7 +136,7 @@
 				on:click={() => openModal(indx)}
 			/>
 		{/each}
-		<Modal artist={chunks[chunkIndex][currArtistIndex]} />
+		<Modal artist={chunks[chunkIndex][currArtistIndex]} {isModalOpen} on:closeModal={() => isModalOpen = false} />
 	</div>
 
 	<div class="sticky bottom-4 m-4 flex flex-col items-end justify-center gap-2">
@@ -157,7 +159,7 @@
 
 			<span class="flex flex-col gap-1">
 				<label for="city" class="italic">Point of Reference:</label>
-				<input
+				<!-- <input
 					type="search"
 					id="city"
 					name="city"
@@ -165,7 +167,8 @@
 					placeholder="Enter city or location..."
 					on:input={getAutoCompleteOptions}
 					bind:value={locationSearchValue}
-				/>
+				/> -->
+				<SearchBar placeholder="Enter city or location..." bind:value={locationSearchValue} on:input={getAutoCompleteOptions} />
 			</span>
 
 			{#if mapboxSuggestions.length > 0}
