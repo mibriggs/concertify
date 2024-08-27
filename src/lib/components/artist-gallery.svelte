@@ -1,8 +1,10 @@
 <script lang="ts">
 	import {
 		mapboxAutomcompleteSchema,
+		mapboxRetrieveSchema,
 		type Artist,
 		type MapBoxAutocompleteOptions,
+		type MapBoxGeoJson,
 		type Suggestion
 	} from '$lib/types';
 	import Modal from '$components/modal.svelte';
@@ -11,7 +13,8 @@
 	import SearchBar from '$components/search-bar.svelte';
 	import { Locate } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
-	import { radiusStore } from '$lib/stores/store';
+	import { geoHashStore, radiusStore } from '$lib/stores/store';
+	import { encodeBase32 } from 'geohashing';
 
 	export let artists: Artist[];
 	export let label: string;
@@ -55,39 +58,47 @@
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	};
 
-	const getAutoCompleteOptions = (e: Event) => {
-		console.log(locationSearchValue);
-		// console.log(value);
-		// clearTimeout(debounceTimer);
-		// debounceTimer = setTimeout(async () => {
-		// 	try {
-		// 		if (value === '') {
-		// 			mapboxSuggestions = [];
-		// 			return;
-		// 		}
-		// 		const res = await fetch(`/api/autocomplete?searchValue=${encodeURIComponent(value)}`);
-		// 		const data = (await res.json()) as unknown;
-		// 		console.log(data);
-		// 		const options: MapBoxAutocompleteOptions = mapboxAutomcompleteSchema.parse(data);
-		// 		mapboxSuggestions = options.suggestions;
-		// 	} catch (error) {
-		// 		console.error(error);
-		// 	}
-		// }, 500);
+	const getAutoCompleteOptions = (e: CustomEvent<any>) => {
+		const value = e.detail.value;
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(async () => {
+			try {
+				if (value === '') {
+					mapboxSuggestions = [];
+					return;
+				}
+				const res = await fetch(`/api/autocomplete?searchValue=${encodeURIComponent(value)}`);
+				const data = (await res.json()) as unknown;
+				const options: MapBoxAutocompleteOptions = mapboxAutomcompleteSchema.parse(data);
+				mapboxSuggestions = options.suggestions;
+			} catch (error) {
+				console.error(error);
+			}
+		}, 500);
 	};
 
 	const retrieveLocation = async (mapboxId: string, name: string) => {
 		try {
 			const res = await fetch(`/api/retrieve?mapboxId=${mapboxId}`);
 			const data = (await res.json()) as unknown;
-			console.log(data);
+			const maybeCoords = mapboxRetrieveSchema.safeParse(data);
+			if (!maybeCoords.success) {
+				console.error(maybeCoords.error);
+			} else {
+				const coords: MapBoxGeoJson = maybeCoords.data;
+				const [long, lat] = coords.features[0].geometry.coordinates;
+				geoHashStore.set({ geoHash: encodeBase32(lat, long), name });
+			}
 			locationSearchValue = name;
 			mapboxSuggestions = [];
 		} catch (error) {
 			console.error(error);
 		}
+	};
 
-		console.log(mapboxId);
+	const cancelSearch = () => {
+		geoHashStore.set({ geoHash: '', name: '' });
+		mapboxSuggestions = [];
 	};
 
 	$: isOnFirstPage = chunkIndex === 0;
@@ -136,7 +147,11 @@
 				on:click={() => openModal(indx)}
 			/>
 		{/each}
-		<Modal artist={chunks[chunkIndex][currArtistIndex]} {isModalOpen} on:closeModal={() => isModalOpen = false} />
+		<Modal
+			artist={chunks[chunkIndex][currArtistIndex]}
+			{isModalOpen}
+			on:modalClose={() => (isModalOpen = false)}
+		/>
 	</div>
 
 	<div class="sticky bottom-4 m-4 flex flex-col items-end justify-center gap-2">
@@ -159,16 +174,12 @@
 
 			<span class="flex flex-col gap-1">
 				<label for="city" class="italic">Point of Reference:</label>
-				<!-- <input
-					type="search"
-					id="city"
-					name="city"
-					class="rounded-md p-1 outline outline-2 outline-stone-300 focus:outline-spotigreen"
+				<SearchBar
 					placeholder="Enter city or location..."
-					on:input={getAutoCompleteOptions}
-					bind:value={locationSearchValue}
-				/> -->
-				<SearchBar placeholder="Enter city or location..." bind:value={locationSearchValue} on:input={getAutoCompleteOptions} />
+					bind:value={$geoHashStore.name}
+					on:inputChange={getAutoCompleteOptions}
+					on:searchCanceled={cancelSearch}
+				/>
 			</span>
 
 			{#if mapboxSuggestions.length > 0}

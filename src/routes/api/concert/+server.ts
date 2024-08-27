@@ -7,6 +7,9 @@ export const GET = async ({ url, cookies }) => {
 		? (url.searchParams.get('artist') as string)
 		: '';
 	const radius = url.searchParams.has('radius') ? (url.searchParams.get('radius') as string) : '10';
+	const manualGeoHashString = url.searchParams.has('loc')
+		? (url.searchParams.get('loc') as string)
+		: '';
 	const geoHashString = cookies.get('geoHash');
 
 	const queryParams: Record<string, string> = {
@@ -20,6 +23,9 @@ export const GET = async ({ url, cookies }) => {
 
 	if (geoHashString) {
 		queryParams.geoPoint = geoHashString;
+	}
+	if (manualGeoHashString !== '') {
+		queryParams.geoPoint = manualGeoHashString;
 	}
 
 	const queryParamString: string = constructQueryParams(queryParams);

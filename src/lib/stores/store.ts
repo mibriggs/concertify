@@ -1,4 +1,3 @@
-import type { MapBoxGeoJson } from '$lib/types';
 import { writable } from 'svelte/store';
 
 function createStore<T>(defaultVal: T) {
@@ -12,4 +11,7 @@ function createStore<T>(defaultVal: T) {
 }
 
 export const radiusStore = createStore<number>(5);
-export const geoHashStore = createStore<MapBoxGeoJson | undefined>(undefined);
+export const geoHashStore = createStore<{ geoHash: string; name: string }>({
+	geoHash: '',
+	name: ''
+});

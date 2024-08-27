@@ -3,7 +3,7 @@
 	import { concertEventSuccessSchema, type Artist, type Concert } from '../types';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
-	import { radiusStore } from '$lib/stores/store';
+	import { geoHashStore, radiusStore } from '$lib/stores/store';
 
 	export let artist: Artist;
 	export let isModalOpen: boolean;
@@ -14,7 +14,6 @@
 	let concert: Concert;
 
 	const dispatch = createEventDispatcher();
-
 
 	onMount(() => {
 		modal.addEventListener('click', closeWithOutsideTap);
@@ -30,7 +29,7 @@
 	const closeModal = () => {
 		isClosing = true;
 		modal.addEventListener('animationend', closeModalHelper, { once: true });
-		dispatch('closeModal');
+		dispatch('modalClose');
 	};
 
 	const closeModalHelper = () => {
@@ -40,11 +39,12 @@
 
 	const fetchData = async () => {
 		if (!artist) return;
-		console.log("in the actual fetch function");
 		isLoading = true;
 		try {
 			const res = await fetch(
-				`/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${$radiusStore}`
+				`/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${$radiusStore}&loc=${
+					$geoHashStore.geoHash
+				}`
 			);
 			const data = (await res.json()) as unknown;
 			concert = concertEventSuccessSchema.parse(data);
