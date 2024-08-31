@@ -5,6 +5,7 @@
 
 	export let placeholder: string;
 	export let value: string;
+	export let id: string = '';
 	let searchBarElement: HTMLElement;
 
 	const dispatch = createEventDispatcher();
@@ -25,7 +26,7 @@
 	class="flex w-full items-center justify-between rounded-lg bg-stone-300 bg-search bg-left-center bg-no-repeat py-2 pl-12 text-spotiblack outline outline-2 outline-transparent focus-within:outline-spotigreen"
 >
 	<input
-		id="search"
+		{id}
 		type="text"
 		class="w-full bg-inherit outline-none"
 		on:input={dispatchInputChangeEvent}
