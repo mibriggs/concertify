@@ -176,6 +176,7 @@
 			<SearchBar
 				id="city"
 				placeholder="Enter city or location..."
+				shouldFocusOnClear={false}
 				bind:value={$geoHashStore.name}
 				on:inputChange={getAutoCompleteOptions}
 				on:searchCanceled={cancelSearch}

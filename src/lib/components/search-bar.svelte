@@ -6,6 +6,7 @@
 	export let placeholder: string;
 	export let value: string;
 	export let id: string = '';
+	export let shouldFocusOnClear: boolean = true;
 	let searchBarElement: HTMLElement;
 
 	const dispatch = createEventDispatcher();
@@ -16,7 +17,7 @@
 	};
 
 	const clearSearchBar = () => {
-		searchBarElement.focus();
+		if (shouldFocusOnClear) searchBarElement.focus();
 		value = '';
 		dispatch('searchCanceled');
 	};
