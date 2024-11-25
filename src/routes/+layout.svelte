@@ -134,12 +134,12 @@
 						</a>
 					</li>
 					<li>
-						<a
+						<!-- <a
 							href="/liked"
 							class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 						>
 							Liked Artists
-						</a>
+						</a> -->
 					</li>
 					<li>
 						<form
