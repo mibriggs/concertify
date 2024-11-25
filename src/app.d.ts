@@ -1,4 +1,4 @@
-import type { AuthTokenWithDate } from '$lib/types';
+import type { AccessTokenWithDate } from '$lib/types';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -6,7 +6,7 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			spotifyAccessTokens: AuthTokenWithDate;
+			spotifyAccessTokens: AccessTokenWithDate;
 		}
 		// interface PageData {}
 		// interface Platform {}

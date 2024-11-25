@@ -109,7 +109,7 @@
 		<div class="hidden items-center justify-between pl-8 md:flex">
 			<span class="sm:text-md text-sm font-bold md:text-xl">{label}</span>
 			<div class="w-5/12">
-				<SearchBar id="search" placeholder="Search artists..." bind:value={searchValue} />
+				<!-- <SearchBar id="search" placeholder="Search artists..." bind:value={searchValue} /> -->
 			</div>
 			<div class="flex gap-4 pr-6">
 				<Button disabled={isOnFirstPage} on:click={prevPage}>Previous</Button>
@@ -126,9 +126,9 @@
 					<Button disabled={isOnLastPage} on:click={nextPage}>Next</Button>
 				</div>
 			</div>
-			<div class="w-full">
+			<!-- <div class="w-full">
 				<SearchBar id="search-mobile" placeholder="Search artists..." bind:value={searchValue} />
-			</div>
+			</div> -->
 		</div>
 	</div>
 
@@ -152,6 +152,7 @@
 		/>
 	</div>
 
+	{#if isOpen}
 	<div
 		id="popup-panel"
 		class:hide={!isOpen}
@@ -208,6 +209,7 @@
 			</ul>
 		{/if}
 	</div>
+	{/if}
 	<button
 		id="location-trigger"
 		class="fixed bottom-2 right-4 z-50 flex size-11 items-center justify-center self-end rounded-full bg-spotigreen shadow-lg active:opacity-80 md:size-14"

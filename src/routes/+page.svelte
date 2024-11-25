@@ -13,6 +13,6 @@
 	});
 </script>
 
-<main class="flex h-screen flex-col items-center justify-center bg-spotiblack font-mono text-white">
+<main class="flex flex-col items-center justify-start bg-spotiblack font-mono text-white">
 	Home page
 </main>
