@@ -8,12 +8,11 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { SPOTIFY_BASE_URL } from '$lib';
 
-const getTop50SongsArtists = async (
+const getTopSongsArtists = async (
 	accessToken: AccessTokenWithDate,
 	artistIds: string[]
 ): Promise<Artist[] | undefined> => {
-	const artistIdsSet = new Set(artistIds);
-	const ids = Array.from(artistIdsSet).join(',');
+	const ids = artistIds.join(',');
 	const fetchUrl = `${SPOTIFY_BASE_URL}/artists?ids=${ids}`;
 	const response = await fetch(fetchUrl, {
 		method: 'GET',
@@ -35,9 +34,9 @@ const getTop50SongsArtists = async (
 	}
 };
 
-const getTop50SongsPlaylist = async (accessToken: AccessTokenWithDate) => {
-	const top50PlaylistId = '0Hm1tCeFv45CJkNeIAtrfF';
-	const fetchUrl = `${SPOTIFY_BASE_URL}/playlists/${top50PlaylistId}/tracks`;
+const getTopArtistIds = async (accessToken: AccessTokenWithDate): Promise<Set<string>> => {
+	const topArtistsPlaylistId = '0Hm1tCeFv45CJkNeIAtrfF';
+	const fetchUrl = `${SPOTIFY_BASE_URL}/playlists/${topArtistsPlaylistId}/tracks`;
 	const response = await fetch(fetchUrl, {
 		method: 'GET',
 		headers: {
@@ -53,14 +52,14 @@ const getTop50SongsPlaylist = async (accessToken: AccessTokenWithDate) => {
 			const top50SongsArtistIds: string[] = maybePlaylistData.data.items.flatMap((item) => {
 				return item.track.artists[0].id;
 			});
-			return await getTop50SongsArtists(accessToken, top50SongsArtistIds);
+			return new Set(top50SongsArtistIds);
 		} else {
 			throw new Error(maybePlaylistData.error.message);
 		}
 	} else {
 		const errorData = await response.json();
 		console.error('Error fetching playlist:', errorData);
-		return;
+		throw new Error('Error fetching playlist:');
 	}
 };
 
@@ -70,5 +69,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
-	return { artists: await getTop50SongsPlaylist(accessToken) };
+	const artistIds = Array.from(await getTopArtistIds(accessToken));
+	const nextArtistId = artistIds[24];
+	const first25Artists = await getTopSongsArtists(accessToken, artistIds.slice(0, 25));
+	return {
+		artists: first25Artists,
+		artistIds,
+		start: 0,
+		end: 25,
+		count: 25,
+		batchNo: 1,
+		nextArtistId
+	};
 };
