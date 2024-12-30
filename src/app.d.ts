@@ -6,7 +6,7 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			spotifyAccessTokens: AccessTokenWithDate;
+			spotifyAccessTokens: AccessTokenWithDate | undefined;
 		}
 		// interface PageData {}
 		// interface Platform {}

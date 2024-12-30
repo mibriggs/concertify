@@ -23,7 +23,8 @@ const getTop50SongsArtists = async (
 	});
 
 	if (response.ok) {
-		const data = (await response.json()) as unknown;
+		// basically spotify changed their api docs out of nowhere so i can no longer access any spotify controlled playlists. Using some user maintained one https://open.spotify.com/playlist/0Hm1tCeFv45CJkNeIAtrfF?si=BNvxUcjMSl23JG1QM-jWXA
+		const data = (await response.json()) as unknown; // need to batch now
 		const maybeArtistsData = severalArtistsSchema.safeParse(data);
 		if (maybeArtistsData.success) {
 			const artists: Artist[] = maybeArtistsData.data.artists;
@@ -35,7 +36,7 @@ const getTop50SongsArtists = async (
 };
 
 const getTop50SongsPlaylist = async (accessToken: AccessTokenWithDate) => {
-	const top50PlaylistId = '37i9dQZEVXbMDoHDwVN2tF';
+	const top50PlaylistId = '0Hm1tCeFv45CJkNeIAtrfF';
 	const fetchUrl = `${SPOTIFY_BASE_URL}/playlists/${top50PlaylistId}/tracks`;
 	const response = await fetch(fetchUrl, {
 		method: 'GET',
@@ -56,6 +57,10 @@ const getTop50SongsPlaylist = async (accessToken: AccessTokenWithDate) => {
 		} else {
 			throw new Error(maybePlaylistData.error.message);
 		}
+	} else {
+		const errorData = await response.json();
+		console.error('Error fetching playlist:', errorData);
+		return;
 	}
 };
 

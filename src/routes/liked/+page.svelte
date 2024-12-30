@@ -7,8 +7,8 @@
 
 <main class="flex flex-col font-mono text-white">
 	<div class="sticky top-20 z-10 flex flex-col gap-2 bg-spotiblack py-3"> -->
-		<!-- For larger screens -->
-		<!-- <div class="hidden items-center justify-between pl-8 md:flex">
+<!-- For larger screens -->
+<!-- <div class="hidden items-center justify-between pl-8 md:flex">
 			<span class="sm:text-md text-sm font-bold md:text-xl">Artists you Like</span>
 			<div class="w-5/12">
 				<SearchBar placeholder="Search artists..." bind:value={searchValue} />
@@ -19,8 +19,8 @@
 			</div>
 		</div> -->
 
-		<!-- For smaller screens -->
-		<!-- <div class="flex flex-col items-center justify-center gap-2 px-6 md:hidden">
+<!-- For smaller screens -->
+<!-- <div class="flex flex-col items-center justify-center gap-2 px-6 md:hidden">
 			<div class="flex w-full items-center justify-between gap-2">
 				<span class="sm:text-md text-sm font-bold md:text-xl">Artists you Like</span>
 				<div class="flex gap-4">

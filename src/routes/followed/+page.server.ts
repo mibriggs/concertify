@@ -17,39 +17,21 @@ export const load: PageServerLoad = async ({ locals }) => {
 	return { artists: await getFollowedArtists(accessToken) };
 };
 
-const getFollowedArtists = async (accessToken: AccessTokenWithDate): Promise<Artist[]> => {
-	let followedArtists: Artist[] = [];
-	let moreArtistsToDiscover: boolean = true;
-	let startingArtist: string = '';
-
-	while (moreArtistsToDiscover) {
-		const fetchUrl = `${SPOTIFY_BASE_URL}/me/following?type=artist&limit=50${
-			startingArtist !== '' ? '&after=' + startingArtist : ''
-		}`;
-		const response = await fetch(fetchUrl, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${accessToken.access_token}`
-			}
-		});
-
-		if (response.ok) {
-			const data = (await response.json()) as unknown;
-			const artistsData: FollowedArtists = followedArtistsSuccessReponseSchema.parse(data);
-
-			const currArtists: Artist[] = artistsData.artists.items;
-			const nextStartingArtist: string | null = artistsData.artists.cursors.after;
-			followedArtists = [...followedArtists, ...currArtists];
-
-			if (!nextStartingArtist) {
-				moreArtistsToDiscover = false;
-			} else {
-				startingArtist = nextStartingArtist;
-			}
-		} else {
-			moreArtistsToDiscover = false;
+const getFollowedArtists = async (
+	accessToken: AccessTokenWithDate
+): Promise<FollowedArtists | undefined> => {
+	const fetchUrl = `${SPOTIFY_BASE_URL}/me/following?type=artist&limit=25`;
+	const response = await fetch(fetchUrl, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${accessToken.access_token}`
 		}
-	}
+	});
 
-	return followedArtists;
+	if (response.ok) {
+		const data = (await response.json()) as unknown;
+		const artistsData: FollowedArtists = followedArtistsSuccessReponseSchema.parse(data);
+		return artistsData;
+	}
+	return undefined;
 };

@@ -69,9 +69,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		? accessTokenSchema.parse(JSON.parse(event.cookies.get('tokens') as string))
 		: undefined;
 
-	console.time('Handle');
 	const response = await resolve(event);
-	console.timeEnd('Handle');
 	return response;
 };
 

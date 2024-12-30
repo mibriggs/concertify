@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import type { PageData } from './$types';
 	import ArtistGallery from '$components/artist-gallery.svelte';
 
@@ -7,4 +7,4 @@
 
 {#if data.artists}
 	<ArtistGallery artists={data.artists} label="Top 50 Artists" />
-{/if}
+{/if} -->
