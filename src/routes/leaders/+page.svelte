@@ -66,7 +66,7 @@
 				}
 			};
 
-			const options: IntersectionObserverInit = { threshold: 0, rootMargin: '275px' };
+			const options: IntersectionObserverInit = { threshold: 0, rootMargin: '300px' };
 			observer = new IntersectionObserver(intersectionObserverCallback, options);
 			observer.observe(container.children[container.childElementCount - 2]);
 		}

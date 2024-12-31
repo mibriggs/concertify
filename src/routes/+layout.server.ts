@@ -8,7 +8,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
 /**
  * Stuff left to do
- * 		1. Switch from a pagination view to infinity scroll
- * 		2. Get the liked artists page working --> how to make this performant?
- * 		3. Get Search functionality working
+ * 		1. Get the liked artists page working --> how to make this performant?
+ * 		2. Get Search functionality working
+ * 		3. FIlter????
  */

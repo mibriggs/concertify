@@ -149,7 +149,9 @@ const savedTracksSuccessResponseSchema = z.object({
 	items: z
 		.object({
 			added_at: z.string(),
-			track: z.object({})
+			track: z.object({
+				artists: simpleArtistSchema.array()
+			})
 		})
 		.array()
 });
@@ -348,3 +350,4 @@ export type Concert = z.infer<typeof concertEventSuccessSchema>;
 export type MapBoxAutocompleteOptions = z.infer<typeof mapboxAutomcompleteSchema>;
 export type Suggestion = z.infer<typeof suggestionSchema>;
 export type MapBoxGeoJson = z.infer<typeof mapboxRetrieveSchema>;
+export type SavedTracks = z.infer<typeof savedTracksSuccessResponseSchema>;

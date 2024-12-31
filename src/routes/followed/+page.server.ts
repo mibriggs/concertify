@@ -2,7 +2,6 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import {
 	type AccessTokenWithDate,
-	type Artist,
 	type FollowedArtists,
 	followedArtistsSuccessReponseSchema
 } from '$lib/types';
