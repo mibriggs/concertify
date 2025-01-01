@@ -351,3 +351,4 @@ export type MapBoxAutocompleteOptions = z.infer<typeof mapboxAutomcompleteSchema
 export type Suggestion = z.infer<typeof suggestionSchema>;
 export type MapBoxGeoJson = z.infer<typeof mapboxRetrieveSchema>;
 export type SavedTracks = z.infer<typeof savedTracksSuccessResponseSchema>;
+export type ArtistImage = z.infer<typeof imageSchema>;

@@ -74,13 +74,11 @@
 		<div class="flex flex-wrap items-center justify-center" bind:this={container}>
 			{#each artists as artist, indx}
 				<ArtistCard
-					imageUrl={artist.images[0].url}
+					artistImages={artist.images}
 					name={artist.name}
 					popularity={artist.popularity ? artist.popularity : 0}
 					genres={artist.genres}
 					followers={artist.followers.total}
-					width={artist.images[0].width}
-					height={artist.images[0].height}
 					on:click={() => openModal(indx)}
 				/>
 			{/each}

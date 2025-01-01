@@ -50,7 +50,7 @@ const getTopArtistIds = async (accessToken: AccessTokenWithDate): Promise<Set<st
 
 		if (maybePlaylistData.success) {
 			const top50SongsArtistIds: string[] = maybePlaylistData.data.items.flatMap((item) => {
-				return item.track.artists[0].id;
+				return item.track.artists.map((artist) => artist.id);
 			});
 			return new Set(top50SongsArtistIds);
 		} else {
