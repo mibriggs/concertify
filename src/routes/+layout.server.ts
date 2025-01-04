@@ -8,7 +8,6 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
 /**
  * Stuff left to do
- * 		1. Get the liked artists page working --> how to make this performant?
- * 		2. Get Search functionality working
- * 		3. FIlter????
+ * 		1. Get Search functionality working
+ * 		2. FIlter????
  */

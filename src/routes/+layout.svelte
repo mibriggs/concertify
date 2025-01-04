@@ -4,17 +4,12 @@
 	import type { LayoutData } from './$types';
 	import { Toaster } from 'svelte-french-toast';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
-	import { getGeoLocation } from '$lib';
 	import { Menu, X } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 
 	export let data: LayoutData;
-
-	afterNavigate(() => {
-		getGeoLocation();
-	});
 
 	let showHamburgerMenu = false;
 	let menuRef: HTMLElement;

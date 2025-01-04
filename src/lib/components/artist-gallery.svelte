@@ -7,10 +7,11 @@
 		type Suggestion
 	} from '$lib/types';
 	import SearchBar from '$components/search-bar.svelte';
-	import { Locate } from 'lucide-svelte';
+	import { Locate, Navigation } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
 	import { geoHashStore, radiusStore } from '$lib/stores/store';
 	import { encodeBase32 } from 'geohashing';
+	import { getGeoLocation } from '$lib';
 
 	export let label: string;
 
@@ -105,16 +106,27 @@
 				/>
 			</span>
 
-			<span class="flex flex-col gap-1">
-				<label for="city" class="italic">Point of Reference:</label>
-				<SearchBar
-					id="city"
-					placeholder="Enter city or location..."
-					shouldFocusOnClear={false}
-					bind:value={$geoHashStore.name}
-					on:inputChange={getAutoCompleteOptions}
-					on:searchCanceled={cancelSearch}
-				/>
+			<span class="flex flex-col gap-2">
+				<div class="flex gap-1 items-center p-1 rounded-md border-stone-300 border-2 cursor-pointer">
+					<button class="flex items-center gap-1" id="current-loc" on:click={getGeoLocation}>
+						<div class="bg-spotigreen text-white p-1 rounded-md flex items-center justify-center">
+							<Navigation />
+						</div>
+					</button>
+					<label for="current-loc" class="cursor-pointer">Use my current location</label>
+				</div>
+
+				<div>
+					<label for="city" class="italic">Point of Reference:</label>
+					<SearchBar
+						id="city"
+						placeholder="Enter city or location..."
+						shouldFocusOnClear={false}
+						bind:value={$geoHashStore.name}
+						on:inputChange={getAutoCompleteOptions}
+						on:searchCanceled={cancelSearch}
+					/>
+				</div>
 			</span>
 
 			{#if mapboxSuggestions.length > 0}
