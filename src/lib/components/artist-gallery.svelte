@@ -107,14 +107,12 @@
 			</span>
 
 			<span class="flex flex-col gap-2">
-				<div class="flex gap-1 items-center p-1 rounded-md border-stone-300 border-2 cursor-pointer">
-					<button class="flex items-center gap-1" id="current-loc" on:click={getGeoLocation}>
+					<button class="flex items-center gap-1 pt-1 w-fit" id="current-loc" on:click={getGeoLocation}>
 						<div class="bg-spotigreen text-white p-1 rounded-md flex items-center justify-center">
 							<Navigation />
 						</div>
+						<label for="current-loc" class="cursor-pointer underline">Use my current location</label>
 					</button>
-					<label for="current-loc" class="cursor-pointer">Use my current location</label>
-				</div>
 
 				<div>
 					<label for="city" class="italic">Point of Reference:</label>
