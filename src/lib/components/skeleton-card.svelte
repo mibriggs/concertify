@@ -1,5 +1,5 @@
 <div
-	class="m-6 flex h-[444px] w-80 transform flex-col items-center justify-center gap-1 rounded-xl bg-neutral-100 p-4 text-start"
+	class="m-6 flex h-[444px] w-80 transform flex-col items-center justify-center gap-1 rounded-xl bg-stone-500 p-4 text-start"
 >
 	<div class="mb-4 h-80 w-72 animate-skeleton rounded-lg bg-neutral-400 shadow-lg" />
 	<!-- image -->
