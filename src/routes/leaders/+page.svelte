@@ -95,6 +95,10 @@
 	});
 </script>
 
+<svelte:window on:wheel|nonpassive={e => {
+    if(isModalOpen) e.preventDefault()
+}} />
+
 {#if isPageLoading}
 	<ArtistGallery label="Top Artists">
 		<div class="flex flex-wrap items-center justify-center">
