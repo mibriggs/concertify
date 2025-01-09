@@ -107,7 +107,7 @@
 				<div class="flex items-center gap-4 self-start p-4 text-sm md:text-base">
 					<span class="flex items-center justify-center gap-1">
 						<MapPinned />
-						<span>{concert._embedded?.events[0]._embedded.venues[0].name}</span>
+						<span>{concert._embedded?.events[0]._embedded.venues[0].name || "Not included"}</span>
 					</span>
 					<span class="flex items-center justify-center gap-1">
 						<Calendar />

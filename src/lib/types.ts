@@ -219,7 +219,7 @@ const concertEventSuccessSchema = z.object({
 					_embedded: z.object({
 						venues: z
 							.object({
-								name: z.string(),
+								name: z.string().optional(),
 								address: z.object({
 									line1: z.string()
 								}),
@@ -244,7 +244,7 @@ const concertEventSuccessSchema = z.object({
 		self: z.object({
 			href: z.string()
 		})
-	}),
+	}).optional(),
 	page: z.object({
 		size: z.number(),
 		totalElements: z.number(),
@@ -305,6 +305,26 @@ const mapboxRetrieveSchema = z.object({
 		.array()
 });
 
+const ticketMasterAttractionsResponse = z.object({
+	page: z.object({
+		size: z.number(),
+		totalElements: z.number(),
+		totalPages: z.number(),
+		number: z.number()
+	}),
+	_embedded: z.object({
+		attractions: z.object({
+			id: z.string(),
+			name: z.string().optional(),
+			type: z.string().optional(),
+			upcomingEvents: z.object({
+				_total: z.number().optional(),
+				_filtered: z.number().optional()
+			})
+		}).array()
+	}).optional()
+});
+
 export type SpotifyAccessTokenBody = {
 	grant_type: 'authorization_code';
 	code: string;
@@ -338,7 +358,8 @@ export {
 	savedTracksSuccessResponseSchema,
 	severalArtistsSchema,
 	mapboxAutomcompleteSchema,
-	mapboxRetrieveSchema
+	mapboxRetrieveSchema,
+	ticketMasterAttractionsResponse
 };
 export type FollowedArtists = z.infer<typeof followedArtistsSuccessReponseSchema>;
 export type Artist = z.infer<typeof artistSchema>;
@@ -352,3 +373,4 @@ export type Suggestion = z.infer<typeof suggestionSchema>;
 export type MapBoxGeoJson = z.infer<typeof mapboxRetrieveSchema>;
 export type SavedTracks = z.infer<typeof savedTracksSuccessResponseSchema>;
 export type ArtistImage = z.infer<typeof imageSchema>;
+export type TicketmasterAttractions = z.infer<typeof ticketMasterAttractionsResponse>
