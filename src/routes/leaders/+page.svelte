@@ -74,28 +74,25 @@
 
 	data.artistIds.then((firstArtistIds) => {
 		artistIds = Array.from(firstArtistIds);
-		console.log(firstArtistIds);
 		if (data.spotifyToken) {
-			getTopSongsArtists(data.spotifyToken, artistIds.slice(0, 25)).then(firstBatch => {
+			getTopSongsArtists(data.spotifyToken, artistIds.slice(0, 25)).then((firstBatch) => {
 				if (firstBatch) {
 					artists = firstBatch;
 					nextArtistId = Array.from(firstArtistIds)[0];
 					tick().then(() => {
-				if (container) setupObserver();
-			});
-			isPageLoading = false;
+						if (container) setupObserver();
+					});
+					isPageLoading = false;
 				}
-				// isPageLoading = false
-			})
+			});
 		}
-			
 	});
 
-	// onDestroy(() => {
-	// 	if (observer) {
-	// 		observer.disconnect();
-	// 	}
-	// });
+	onDestroy(() => {
+		if (observer) {
+			observer.disconnect();
+		}
+	});
 </script>
 
 {#if isPageLoading}
