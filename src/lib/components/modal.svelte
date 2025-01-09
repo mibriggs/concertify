@@ -12,6 +12,7 @@
 	let isClosing: boolean = false;
 	let isLoading: boolean = false;
 	let concert: Concert;
+	let scrollPosition = 0;
 
 	const dispatch = createEventDispatcher();
 
@@ -55,7 +56,21 @@
 		}
 	};
 
-	$: if (isModalOpen) fetchData();
+	$: if (isModalOpen) {
+		fetchData();
+	}
+
+	$: if (isModalOpen) {
+		scrollPosition = window.scrollY;
+		document.body.style.position = 'fixed';
+		document.body.style.top = `-${scrollPosition}px`;
+		document.body.style.overflow = 'hidden';
+	} else {
+		document.body.style.overflow = '';
+		document.body.style.position = '';
+		document.body.style.top = '';
+		window.scrollTo(0, scrollPosition);
+	}
 </script>
 
 <dialog
