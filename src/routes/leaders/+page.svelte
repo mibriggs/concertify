@@ -5,14 +5,15 @@
 	import ArtistGallery from '$components/artist-gallery.svelte';
 	import Modal from '$components/modal.svelte';
 	import { onDestroy, tick } from 'svelte';
-	import { SPOTIFY_BASE_URL } from '$lib';
+	import { getTopSongsArtists, SPOTIFY_BASE_URL } from '$lib';
 	import SkeletonCard from '$components/skeleton-card.svelte';
-	import { fade } from 'svelte/transition';
 
 	export let data: PageData;
 
 	let artists: Artist[] = [];
-	let nextArtistId = data.nextArtistId;
+	let nextArtistId: string | undefined = '';
+	let artistIds: string[] = [];
+
 	let currArtistIndex: number;
 	let isModalOpen: boolean = false;
 	let observer: IntersectionObserver;
@@ -20,7 +21,6 @@
 	let batchNo = data.batchNo;
 	let startIndex = data.start;
 	let endIndex = data.end;
-	let artistIds = data.artistIds;
 	let isPageLoading = true;
 
 	const openModal = (artistIndex: number) => {
@@ -72,23 +72,30 @@
 		observer.observe(container.children[container.childElementCount - 2]);
 	};
 
-	data.artists.then((firstBatch) => {
-		if (firstBatch) {
-			artists = firstBatch;
-			tick().then(() => {
-				if (container) {
-					setupObserver();
-				}
+	data.artistIds.then((firstArtistIds) => {
+		artistIds = Array.from(firstArtistIds);
+		console.log(firstArtistIds);
+		if (data.spotifyToken) {
+			getTopSongsArtists(data.spotifyToken, artistIds.slice(0, 25)).then(firstBatch => {
+				if (firstBatch) {
+					artists = firstBatch;
+					nextArtistId = Array.from(firstArtistIds)[0];
+					tick().then(() => {
+				if (container) setupObserver();
 			});
 			isPageLoading = false;
+				}
+				// isPageLoading = false
+			})
 		}
+			
 	});
 
-	onDestroy(() => {
-		if (observer) {
-			observer.disconnect();
-		}
-	});
+	// onDestroy(() => {
+	// 	if (observer) {
+	// 		observer.disconnect();
+	// 	}
+	// });
 </script>
 
 {#if isPageLoading}

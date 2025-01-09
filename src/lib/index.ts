@@ -1,4 +1,5 @@
 import { encodeBase32 } from 'geohashing';
+import { type AccessTokenWithDate, type Artist, severalArtistsSchema } from './types';
 
 export const SPOTIFY_BASE_URL = 'https://api.spotify.com/v1';
 export const TICKETMASTER_BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
@@ -83,4 +84,30 @@ export const makeDateHumanReadable = (oldDateFormat: string | undefined) => {
 	const [year, month, day] = oldDateFormat.split('-').map((datePortion) => parseInt(datePortion));
 	const date = new Date(year, month - 1, day);
 	return date.toDateString();
+};
+
+export const getTopSongsArtists = async (
+	accessToken: AccessTokenWithDate,
+	artistIds: string[]
+): Promise<Artist[] | undefined> => {
+	const ids = artistIds.join(',');
+	const fetchUrl = `${SPOTIFY_BASE_URL}/artists?ids=${ids}`;
+	const response = await fetch(fetchUrl, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${accessToken.access_token}`
+		}
+	});
+
+	if (response.ok) {
+		// basically spotify changed their api docs out of nowhere so i can no longer access any spotify controlled playlists. Using some user maintained one https://open.spotify.com/playlist/0Hm1tCeFv45CJkNeIAtrfF?si=BNvxUcjMSl23JG1QM-jWXA
+		const data = (await response.json()) as unknown; // need to batch now
+		const maybeArtistsData = severalArtistsSchema.safeParse(data);
+		if (maybeArtistsData.success) {
+			const artists: Artist[] = maybeArtistsData.data.artists;
+			return artists;
+		} else {
+			throw new Error(maybeArtistsData.error.message);
+		}
+	}
 };

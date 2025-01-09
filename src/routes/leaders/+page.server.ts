@@ -72,12 +72,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const artistIds = Array.from(await getTopArtistIds(accessToken));
 
 	return {
-		artistIds: artistIds,
-		nextArtistId: artistIds[24],
+		artistIds: getTopArtistIds(accessToken),
+		// nextArtistId: artistIds[24],
 		start: 0,
 		end: 25,
 		count: 25,
 		batchNo: 1,
-		artists: getTopSongsArtists(accessToken, artistIds.slice(0, 25))
+		// artists: getTopSongsArtists(accessToken, artistIds.slice(0, 25))
 	};
 };
