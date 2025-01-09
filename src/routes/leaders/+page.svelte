@@ -4,13 +4,14 @@
 	import ArtistCard from '$components/artist-card.svelte';
 	import ArtistGallery from '$components/artist-gallery.svelte';
 	import Modal from '$components/modal.svelte';
-	import { onDestroy, onMount, tick } from 'svelte';
-	import { browser } from '$app/environment';
+	import { onDestroy, tick } from 'svelte';
 	import { SPOTIFY_BASE_URL } from '$lib';
+	import SkeletonCard from '$components/skeleton-card.svelte';
+	import { fade } from 'svelte/transition';
 
 	export let data: PageData;
 
-	let artists: Artist[] = data.artists ? data.artists : [];
+	let artists: Artist[] = [];
 	let nextArtistId = data.nextArtistId;
 	let currArtistIndex: number;
 	let isModalOpen: boolean = false;
@@ -20,6 +21,7 @@
 	let startIndex = data.start;
 	let endIndex = data.end;
 	let artistIds = data.artistIds;
+	let isPageLoading = true;
 
 	const openModal = (artistIndex: number) => {
 		currArtistIndex = artistIndex;
@@ -29,46 +31,56 @@
 		modal?.showModal();
 	};
 
-	onMount(() => {
-		if (browser) {
-			const intersectionObserverCallback: IntersectionObserverCallback = async (
-				entries,
-				observer
-			) => {
-				let lastCard = entries[0];
-				if (lastCard.isIntersecting && nextArtistId) {
-					observer.unobserve(lastCard.target);
-					batchNo++;
-					startIndex = endIndex;
-					endIndex = data.count * batchNo;
-					nextArtistId = artistIds[endIndex];
-					const ids = artistIds.slice(startIndex, endIndex).join(',');
-					const fetchUrl = `${SPOTIFY_BASE_URL}/artists?ids=${ids}`;
-					const response = await fetch(fetchUrl, {
-						method: 'GET',
-						headers: {
-							Authorization: `Bearer ${data.spotifyToken?.access_token}`
-						}
-					});
-
-					if (response.ok) {
-						const data = (await response.json()) as unknown; // need to batch now
-						const maybeArtistsData = severalArtistsSchema.safeParse(data);
-						if (maybeArtistsData.success) {
-							artists = [...artists, ...maybeArtistsData.data.artists];
-						} else {
-							throw new Error(maybeArtistsData.error.message);
-						}
+	const setupObserver = () => {
+		const intersectionObserverCallback: IntersectionObserverCallback = async (
+			entries,
+			observer
+		) => {
+			let lastCard = entries[0];
+			if (lastCard.isIntersecting && nextArtistId) {
+				observer.unobserve(lastCard.target);
+				batchNo++;
+				startIndex = endIndex;
+				endIndex = data.count * batchNo;
+				nextArtistId = artistIds[endIndex];
+				const ids = artistIds.slice(startIndex, endIndex).join(',');
+				const fetchUrl = `${SPOTIFY_BASE_URL}/artists?ids=${ids}`;
+				const response = await fetch(fetchUrl, {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${data.spotifyToken?.access_token}`
 					}
-					await tick();
-					let newLastCard = container.children[container.childElementCount - 2];
-					observer.observe(newLastCard);
-				}
-			};
+				});
 
-			const options: IntersectionObserverInit = { threshold: 0, rootMargin: '300px' };
-			observer = new IntersectionObserver(intersectionObserverCallback, options);
-			observer.observe(container.children[container.childElementCount - 2]);
+				if (response.ok) {
+					const data = (await response.json()) as unknown; // need to batch now
+					const maybeArtistsData = severalArtistsSchema.safeParse(data);
+					if (maybeArtistsData.success) {
+						artists = [...artists, ...maybeArtistsData.data.artists];
+					} else {
+						throw new Error(maybeArtistsData.error.message);
+					}
+				}
+				await tick();
+				let newLastCard = container.children[container.childElementCount - 2];
+				observer.observe(newLastCard);
+			}
+		};
+
+		const options: IntersectionObserverInit = { threshold: 0, rootMargin: '300px' };
+		observer = new IntersectionObserver(intersectionObserverCallback, options);
+		observer.observe(container.children[container.childElementCount - 2]);
+	};
+
+	data.artists.then((firstBatch) => {
+		if (firstBatch) {
+			artists = firstBatch;
+			tick().then(() => {
+				if (container) {
+					setupObserver();
+				}
+			});
+			isPageLoading = false;
 		}
 	});
 
@@ -79,7 +91,15 @@
 	});
 </script>
 
-{#if data.artists}
+{#if isPageLoading}
+	<ArtistGallery label="Top Artists">
+		<div class="flex flex-wrap items-center justify-center">
+			{#each Array(32) as _}
+				<SkeletonCard />
+			{/each}
+		</div>
+	</ArtistGallery>
+{:else}
 	<ArtistGallery label="Top Artists">
 		<div class="flex flex-wrap items-center justify-center" bind:this={container}>
 			{#each artists as artist, indx}

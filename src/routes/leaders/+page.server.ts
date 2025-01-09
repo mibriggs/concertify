@@ -70,15 +70,14 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
 	const artistIds = Array.from(await getTopArtistIds(accessToken));
-	const nextArtistId = artistIds[24];
-	const first25Artists = await getTopSongsArtists(accessToken, artistIds.slice(0, 25));
+
 	return {
-		artists: first25Artists,
-		artistIds,
+		artistIds: artistIds,
+		nextArtistId: artistIds[24],
 		start: 0,
 		end: 25,
 		count: 25,
 		batchNo: 1,
-		nextArtistId
+		artists: getTopSongsArtists(accessToken, artistIds.slice(0, 25))
 	};
 };

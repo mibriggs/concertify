@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
-	return { artists: await getFollowedArtists(accessToken) };
+	return { artists: getFollowedArtists(accessToken) };
 };
 
 const getFollowedArtists = async (
