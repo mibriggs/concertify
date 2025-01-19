@@ -35,21 +35,32 @@ export const GET = async ({ url, cookies }) => {
 		eventQueryParams.geoPoint = manualGeoHashString;
 	}
 
-	const fetchAttractionsUrl: string = encodeURI(`${TICKETMASTER_BASE_URL}/attractions.json?${constructQueryParams(attractionsQuerParams)}`);
+	const fetchAttractionsUrl: string = encodeURI(
+		`${TICKETMASTER_BASE_URL}/attractions.json?${constructQueryParams(attractionsQuerParams)}`
+	);
 	const attractionsResponse = await fetch(fetchAttractionsUrl);
 
 	if (attractionsResponse.ok) {
-		const data = await attractionsResponse.json() as unknown;
+		const data = (await attractionsResponse.json()) as unknown;
 		const attractions: TicketmasterAttractions = ticketMasterAttractionsResponse.parse(data);
-		const matchingAtttractions = attractions.page.totalElements > 0 && attractions._embedded? attractions._embedded?.attractions
-		.filter(attraction => attraction.name && attraction.name.toLowerCase() === artistName.toLowerCase())
-		.map(attraction => {
-			return {
-				id: attraction.id,
-				name: attraction.name? attraction.name : '',
-				upcomingEvents: attraction.upcomingEvents._total? attraction.upcomingEvents._total : 0
-			}
-		}).filter(attraction => attraction.upcomingEvents > 0) : []
+		const matchingAtttractions =
+			attractions.page.totalElements > 0 && attractions._embedded
+				? attractions._embedded?.attractions
+						.filter(
+							(attraction) =>
+								attraction.name && attraction.name.toLowerCase() === artistName.toLowerCase()
+						)
+						.map((attraction) => {
+							return {
+								id: attraction.id,
+								name: attraction.name ? attraction.name : '',
+								upcomingEvents: attraction.upcomingEvents._total
+									? attraction.upcomingEvents._total
+									: 0
+							};
+						})
+						.filter((attraction) => attraction.upcomingEvents > 0)
+				: [];
 		if (matchingAtttractions.length === 0) {
 			return json({
 				page: {
@@ -60,11 +71,13 @@ export const GET = async ({ url, cookies }) => {
 				}
 			});
 		}
-		
+
 		// we know the artist we want has events coming
 		const artistId = matchingAtttractions[0].id;
 		eventQueryParams.attractionId = artistId;
-		const eventFetchUrl: string = encodeURI(`${TICKETMASTER_BASE_URL}/events.json?${constructQueryParams(eventQueryParams)}`);
+		const eventFetchUrl: string = encodeURI(
+			`${TICKETMASTER_BASE_URL}/events.json?${constructQueryParams(eventQueryParams)}`
+		);
 		const eventResponse = await fetch(eventFetchUrl);
 		if (eventResponse.ok) {
 			const data = await eventResponse.json();

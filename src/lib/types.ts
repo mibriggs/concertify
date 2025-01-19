@@ -240,11 +240,13 @@ const concertEventSuccessSchema = z.object({
 				.array()
 		})
 		.optional(),
-	_links: z.object({
-		self: z.object({
-			href: z.string()
+	_links: z
+		.object({
+			self: z.object({
+				href: z.string()
+			})
 		})
-	}).optional(),
+		.optional(),
 	page: z.object({
 		size: z.number(),
 		totalElements: z.number(),
@@ -312,17 +314,21 @@ const ticketMasterAttractionsResponse = z.object({
 		totalPages: z.number(),
 		number: z.number()
 	}),
-	_embedded: z.object({
-		attractions: z.object({
-			id: z.string(),
-			name: z.string().optional(),
-			type: z.string().optional(),
-			upcomingEvents: z.object({
-				_total: z.number().optional(),
-				_filtered: z.number().optional()
-			})
-		}).array()
-	}).optional()
+	_embedded: z
+		.object({
+			attractions: z
+				.object({
+					id: z.string(),
+					name: z.string().optional(),
+					type: z.string().optional(),
+					upcomingEvents: z.object({
+						_total: z.number().optional(),
+						_filtered: z.number().optional()
+					})
+				})
+				.array()
+		})
+		.optional()
 });
 
 export type SpotifyAccessTokenBody = {
@@ -373,4 +379,4 @@ export type Suggestion = z.infer<typeof suggestionSchema>;
 export type MapBoxGeoJson = z.infer<typeof mapboxRetrieveSchema>;
 export type SavedTracks = z.infer<typeof savedTracksSuccessResponseSchema>;
 export type ArtistImage = z.infer<typeof imageSchema>;
-export type TicketmasterAttractions = z.infer<typeof ticketMasterAttractionsResponse>
+export type TicketmasterAttractions = z.infer<typeof ticketMasterAttractionsResponse>;

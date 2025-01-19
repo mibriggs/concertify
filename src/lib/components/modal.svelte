@@ -104,10 +104,12 @@
 				</div>
 			{/if}
 			{#if concert && concert.page.totalElements > 0}
-				<div class="flex items-center gap-2 self-center px-1 py-4 text-sm md:text-base md:p-4 md:gap-4 md:self-start">
+				<div
+					class="flex items-center gap-2 self-center px-1 py-4 text-sm md:gap-4 md:self-start md:p-4 md:text-base"
+				>
 					<span class="flex items-center justify-center gap-1">
 						<MapPinned />
-						<span>{concert._embedded?.events[0]._embedded.venues[0].name || "Not included"}</span>
+						<span>{concert._embedded?.events[0]._embedded.venues[0].name || 'Not included'}</span>
 					</span>
 					<span class="flex items-center justify-center gap-1">
 						<Calendar />

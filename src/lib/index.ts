@@ -81,10 +81,10 @@ export const convertTo12HourFormat = (time24: string | undefined) => {
 
 export const makeDateHumanReadable = (oldDateFormat: string | undefined) => {
 	if (!oldDateFormat) return '';
-	
+
 	const dayFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'short' });
 	const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
-	
+
 	const [year, month, day] = oldDateFormat.split('-').map((datePortion) => parseInt(datePortion));
 	const date = new Date(year, month - 1, day);
 

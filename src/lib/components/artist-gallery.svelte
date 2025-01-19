@@ -159,7 +159,7 @@
 	{/if}
 	<button
 		id="location-trigger"
-		class="fixed bottom-2 right-4 z-50 flex size-11 items-center justify-center self-end rounded-full bg-spotigreen shadow-lg active:opacity-80 md:size-14"
+		class="fixed bottom-2 right-4 z-50 flex size-14 items-center justify-center self-end rounded-full bg-spotigreen shadow-lg active:opacity-80"
 		on:click={() => (isOpen = !isOpen)}
 	>
 		<Locate />
