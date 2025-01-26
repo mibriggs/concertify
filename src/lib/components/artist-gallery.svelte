@@ -23,6 +23,7 @@
 	let mapboxSuggestions: Suggestion[] = [];
 	let editLocationContainer: HTMLDivElement;
 	let openLocationContainer: HTMLButtonElement;
+	let inputSlider: HTMLInputElement;
 
 	const getAutoCompleteOptions = (e: CustomEvent<any>) => {
 		const value = e.detail.value;
@@ -92,7 +93,7 @@
 	};
 
 	const closeLocationMenu = (e: TouchEvent) => {
-		if (editLocationContainer && e.target instanceof Node && !editLocationContainer.contains(e.target)) {
+		if (editLocationContainer && e.target instanceof Node && !inputSlider.contains(e.target)) {
 			editLocationContainer.classList.remove('show');
 			editLocationContainer.classList.add('hide');
 			isOpen = false;
@@ -157,6 +158,7 @@
 					id="radius"
 					name="radius"
 					bind:value={$radiusStore}
+					bind:this={inputSlider}
 				/>
 			</span>
 
