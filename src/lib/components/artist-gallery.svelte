@@ -12,6 +12,8 @@
 	import { geoHashStore, radiusStore } from '$lib/stores/store';
 	import { encodeBase32 } from 'geohashing';
 	import { getGeoLocation } from '$lib';
+	import { onDestroy, onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
 	export let label: string;
 
@@ -19,6 +21,7 @@
 	let searchValue: string = '';
 	let isOpen: boolean = false;
 	let mapboxSuggestions: Suggestion[] = [];
+	let editLocationContainer: HTMLDivElement;
 
 	const getAutoCompleteOptions = (e: CustomEvent<any>) => {
 		const value = e.detail.value;
@@ -61,6 +64,44 @@
 		geoHashStore.set({ geoHash: '', name: '' });
 		mapboxSuggestions = [];
 	};
+
+	const closeOnOutsideClick = (e: MouseEvent) => {
+		if (editLocationContainer) {
+			const divBoundingClient: DOMRect = editLocationContainer.getBoundingClientRect();
+			const isContainerClicked =
+				e.clientX >= divBoundingClient.left &&
+				e.clientX <= divBoundingClient.right &&
+				e.clientY >= divBoundingClient.top &&
+				e.clientY <= divBoundingClient.bottom;
+			if (!isContainerClicked) {
+				editLocationContainer.classList.remove('show');
+				editLocationContainer.classList.add('hide');
+				isOpen = false;
+			}
+		}
+	};
+
+	const closeLocationMenu = () => {
+		if (editLocationContainer) {
+			editLocationContainer.classList.remove('show');
+			editLocationContainer.classList.add('hide');
+			isOpen = false;
+		}
+	};
+
+	onMount(() => {
+		if (browser) {
+			document.addEventListener('mousedown', closeOnOutsideClick);
+			document.addEventListener('touchmove', closeLocationMenu);
+		}
+	});
+
+	onDestroy(() => {
+		if (browser) {
+			document.removeEventListener('mousedown', closeOnOutsideClick);
+			document.removeEventListener('touchmove', closeLocationMenu);
+		}
+	});
 </script>
 
 <main class="flex flex-col font-mono text-white">
@@ -91,7 +132,8 @@
 			id="popup-panel"
 			class:hide={!isOpen}
 			class:show={isOpen}
-			class="fixed bottom-16 right-4 z-50 flex w-11/12 flex-col gap-3 self-end rounded-lg bg-white p-3 text-start text-spotiblack opacity-100 shadow-lg md:bottom-20 md:w-[33%]"
+			class="fixed bottom-[72px] right-4 z-50 flex w-11/12 flex-col gap-3 self-end rounded-lg bg-white p-3 text-start text-spotiblack opacity-100 shadow-lg md:bottom-20 md:w-[33%]"
+			bind:this={editLocationContainer}
 		>
 			<span class="flex flex-col gap-1">
 				<label for="radius" class="italic">Search Radius: {$radiusStore} miles</label>
