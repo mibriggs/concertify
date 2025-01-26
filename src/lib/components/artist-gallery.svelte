@@ -91,8 +91,8 @@
 		}
 	};
 
-	const closeLocationMenu = () => {
-		if (editLocationContainer) {
+	const closeLocationMenu = (e: TouchEvent) => {
+		if (editLocationContainer && e.target instanceof Node && !editLocationContainer.contains(e.target)) {
 			editLocationContainer.classList.remove('show');
 			editLocationContainer.classList.add('hide');
 			isOpen = false;
