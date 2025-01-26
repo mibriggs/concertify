@@ -22,6 +22,7 @@
 	let isOpen: boolean = false;
 	let mapboxSuggestions: Suggestion[] = [];
 	let editLocationContainer: HTMLDivElement;
+	let openLocationContainer: HTMLButtonElement;
 
 	const getAutoCompleteOptions = (e: CustomEvent<any>) => {
 		const value = e.detail.value;
@@ -66,14 +67,23 @@
 	};
 
 	const closeOnOutsideClick = (e: MouseEvent) => {
-		if (editLocationContainer) {
+		if (editLocationContainer && openLocationContainer) {
 			const divBoundingClient: DOMRect = editLocationContainer.getBoundingClientRect();
+			const buttonBoundingClient: DOMRect = openLocationContainer.getBoundingClientRect();
+
 			const isContainerClicked =
 				e.clientX >= divBoundingClient.left &&
 				e.clientX <= divBoundingClient.right &&
 				e.clientY >= divBoundingClient.top &&
 				e.clientY <= divBoundingClient.bottom;
-			if (!isContainerClicked) {
+
+			const isButtonClicked =
+				e.clientX >= buttonBoundingClient.left &&
+				e.clientX <= buttonBoundingClient.right &&
+				e.clientY >= buttonBoundingClient.top &&
+				e.clientY <= buttonBoundingClient.bottom;
+
+			if (!isContainerClicked && !isButtonClicked) {
 				editLocationContainer.classList.remove('show');
 				editLocationContainer.classList.add('hide');
 				isOpen = false;
@@ -102,6 +112,8 @@
 			document.removeEventListener('touchmove', closeLocationMenu);
 		}
 	});
+
+	$: console.log(isOpen);
 </script>
 
 <main class="flex flex-col font-mono text-white">
@@ -202,6 +214,7 @@
 	<button
 		id="location-trigger"
 		class="fixed bottom-2 right-4 z-50 flex size-14 items-center justify-center self-end rounded-full bg-spotigreen shadow-lg active:opacity-80"
+		bind:this={openLocationContainer}
 		on:click={() => (isOpen = !isOpen)}
 	>
 		<Locate />
