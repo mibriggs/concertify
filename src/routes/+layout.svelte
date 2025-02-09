@@ -15,6 +15,21 @@
 	let menuRef: HTMLElement;
 	let currentUrl: string;
 
+	const detectServiceWorkerUpdate = async () => {
+		const registration = await navigator.serviceWorker.ready;
+		registration.addEventListener('updatefound', () => {
+			const newServiceWorker = registration.installing;
+			newServiceWorker?.addEventListener('statechange', () => {
+				if (newServiceWorker.state === 'installing') {
+					if (confirm("A new version is available! Please reload to update")) {
+						newServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+						window.location.reload();
+					}
+				}
+			});
+		});
+	}
+
 	const handleClickOutside = (e: MouseEvent) => {
 		if (menuRef && !menuRef.contains(e.target as Node)) {
 			showHamburgerMenu = false;
@@ -22,6 +37,7 @@
 	};
 
 	onMount(() => {
+		detectServiceWorkerUpdate();
 		document.addEventListener('mousedown', handleClickOutside);
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	});
