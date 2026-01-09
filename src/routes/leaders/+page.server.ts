@@ -39,7 +39,7 @@ const getTopArtistIds = async (accessToken: AccessTokenWithDate): Promise<Set<st
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.spotifyAccessTokens) {
-		throw redirect(302, '/?signedout=true');
+		throw redirect(302, '/login?signedout=true');
 	}
 
 	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;

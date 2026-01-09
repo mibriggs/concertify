@@ -1,10 +1,20 @@
 import type { PageServerLoad } from './$types';
-import type { SpotifyRedirectOptions } from '$lib/types';
-import { SECRET_SPOTIFY_ID } from '$env/static/private';
-import { constructQueryParams, generateRandomString } from '$lib';
 import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
+	// If user is logged in, redirect to leaders page
+	if (locals.spotifyAccessTokens) {
+		throw redirect(302, '/leaders');
+	}
+
+	// Check if this is an OAuth callback (has code and state params)
+	const isOAuthCallback = url.searchParams.has('code') && url.searchParams.has('state');
+
+	// If not logged in and not an OAuth callback, redirect to login page
+	if (!locals.spotifyAccessTokens && !isOAuthCallback) {
+		throw redirect(302, '/login');
+	}
+
 	if (url.searchParams.has('signedout')) {
 		const searchParam = url.searchParams.get('signedout');
 		if (searchParam) {
@@ -14,28 +24,6 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 export const actions = {
-	authWithSpotify: async ({ cookies, url }) => {
-		const state = generateRandomString(20);
-		const spotifyRedirectOptions: SpotifyRedirectOptions = {
-			response_type: 'code',
-			client_id: SECRET_SPOTIFY_ID,
-			redirect_uri: url.origin,
-			scope: 'user-follow-read user-library-read',
-			state,
-			show_dialog: true
-		};
-		const spotifyAuthRequestQueryParams: string = constructQueryParams(spotifyRedirectOptions);
-
-		cookies.set('state', state, {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'lax',
-			maxAge: 60 * 60 * 24 * 30
-		});
-
-		const spotifyUrl: string = `https://accounts.spotify.com/authorize?${spotifyAuthRequestQueryParams}`;
-		throw redirect(307, spotifyUrl);
-	},
 	logoutUser: async ({ cookies }) => {
 		cookies.getAll().forEach((cookie) => cookies.delete(cookie.name, { path: '/' }));
 		throw redirect(302, '/');

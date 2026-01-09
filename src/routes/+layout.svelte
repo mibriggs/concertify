@@ -59,9 +59,6 @@
 	class="sticky top-0 z-10 hidden items-center justify-start gap-2 bg-spotiblack p-6 font-mono text-white md:flex"
 >
 	<div class="flex">
-		<a href="/" class="rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-spotigreen">
-			Home
-		</a>
 		<a
 			href="/leaders"
 			data-sveltekit-preload-data
@@ -84,15 +81,23 @@
 			Liked Artists
 		</a>
 	</div>
-	<form
-		method="post"
-		action={!data.spotifyToken ? '/?/authWithSpotify' : '/?/logoutUser'}
-		use:enhance
-		class="ml-auto self-end rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-spotigreen"
-		class:signed-in={data.spotifyToken}
-	>
-		<button class="cutoff-text text-white">{!data.spotifyToken ? 'Login' : 'Logout'}</button>
-	</form>
+	{#if data.spotifyToken}
+		<form
+			method="post"
+			action="/?/logoutUser"
+			use:enhance
+			class="signed-in ml-auto self-end rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-spotigreen"
+		>
+			<button class="cutoff-text text-white">Logout</button>
+		</form>
+	{:else}
+		<a
+			href="/login"
+			class="ml-auto self-end rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-spotigreen"
+		>
+			Login
+		</a>
+	{/if}
 </nav>
 
 <nav class="sticky top-0 z-[1000] border-gray-200 bg-spotiblack md:hidden">
@@ -124,14 +129,10 @@
 					bind:this={menuRef}
 				>
 					<li>
-						<a href="/" class="block rounded bg-spotigreen px-3 py-2 text-white" aria-current="page"
-							>Home</a
-						>
-					</li>
-					<li>
 						<a
 							href="/leaders"
-							class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+							class="block rounded bg-spotigreen px-3 py-2 text-white"
+							aria-current="page"
 						>
 							Top Artists
 						</a>
@@ -153,17 +154,21 @@
 						</a>
 					</li>
 					<li>
-						<form
-							method="post"
-							action={!data.spotifyToken ? '/?/authWithSpotify' : '/?/logoutUser'}
-							use:enhance
-							class:signed-in={data.spotifyToken}
-						>
-							<button
-								class="block w-full rounded px-3 py-2 text-start text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-								>{!data.spotifyToken ? 'Login' : 'Logout'}</button
+						{#if data.spotifyToken}
+							<form method="post" action="/?/logoutUser" use:enhance class="signed-in">
+								<button
+									class="block w-full rounded px-3 py-2 text-start text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+									>Logout</button
+								>
+							</form>
+						{:else}
+							<a
+								href="/login"
+								class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 							>
-						</form>
+								Login
+							</a>
+						{/if}
 					</li>
 				</ul>
 			</div>

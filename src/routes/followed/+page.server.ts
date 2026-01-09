@@ -9,7 +9,7 @@ import { SPOTIFY_BASE_URL } from '$lib';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.spotifyAccessTokens) {
-		throw redirect(302, '/?signedout=true');
+		throw redirect(302, '/login?signedout=true');
 	}
 
 	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
