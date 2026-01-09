@@ -4,6 +4,7 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
 	import { geoHashStore, radiusStore } from '$lib/stores/store';
+	import VenueMap from './venue-map.svelte';
 
 	export let artist: Artist;
 	export let isModalOpen: boolean;
@@ -48,9 +49,32 @@
 				}`
 			);
 			const data = (await res.json()) as unknown;
+			console.log('API Response for artist:', artist.name, data);
+			// if (!res.ok) {
+			// 	console.error('API failed with status:', res.status, data);
+			// 	// API returned an error, set concert to show "no concerts found"
+			// 	concert = {
+			// 		page: {
+			// 			totalElements: 0,
+			// 			size: 0,
+			// 			totalPages: 0,
+			// 			number: 0
+			// 		}
+			// 	};
+			// 	return;
+			// }
 			concert = concertEventSuccessSchema.parse(data);
 		} catch (error) {
-			console.error(error);
+			console.error('Error fetching/parsing concert data:', error);
+			// // On parsing error, set concert to show "no concerts found"
+			// concert = {
+			// 	page: {
+			// 		totalElements: 0,
+			// 		size: 0,
+			// 		totalPages: 0,
+			// 		number: 0
+			// 	}
+			// };
 		} finally {
 			isLoading = false;
 		}
@@ -116,15 +140,23 @@
 						<span>{makeDateHumanReadable(concert._embedded?.events[0].dates.start.localDate)}</span>
 					</span>
 				</div>
-				<img
-					src={concert._embedded?.events[0]._embedded.venues[0].images?.at(0)?.url}
-					width={concert._embedded?.events[0]._embedded.venues[0].images?.at(0)?.width}
-					height={concert._embedded?.events[0]._embedded.venues[0].images?.at(0)?.height}
-					alt="Venue"
-				/>
+				<div class="w-full px-4">
+					<VenueMap
+						longitude={parseFloat(
+							concert._embedded?.events[0]._embedded.venues[0].location?.longitude || '0'
+						)}
+						latitude={parseFloat(
+							concert._embedded?.events[0]._embedded.venues[0].location?.latitude || '0'
+						)}
+						venueName={concert._embedded?.events[0]._embedded.venues[0].name || 'Venue'}
+					/>
+				</div>
 				<div class="self-start pl-4 font-semibold">About Event</div>
 				<ul class=" self-start pl-4">
-					<li>Address: {concert._embedded?.events[0]._embedded.venues[0].address.line1}</li>
+					<li>
+						Address: {concert._embedded?.events[0]._embedded.venues[0].address?.line1 ||
+							'Not available'}
+					</li>
 					<li>
 						Doors Open: {convertTo12HourFormat(concert._embedded?.events[0].dates.start.localTime)}
 					</li>

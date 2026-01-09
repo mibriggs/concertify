@@ -220,9 +220,17 @@ const concertEventSuccessSchema = z.object({
 						venues: z
 							.object({
 								name: z.string().optional(),
-								address: z.object({
-									line1: z.string()
-								}),
+								address: z
+									.object({
+										line1: z.string().optional()
+									})
+									.optional(),
+								location: z
+									.object({
+										longitude: z.string(),
+										latitude: z.string()
+									})
+									.optional(),
 								images: z
 									.object({
 										ratio: z.string(),
