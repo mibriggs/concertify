@@ -21,14 +21,14 @@
 			const newServiceWorker = registration.installing;
 			newServiceWorker?.addEventListener('statechange', () => {
 				if (newServiceWorker.state === 'installing') {
-					if (confirm("A new version is available! Please reload to update")) {
+					if (confirm('A new version is available! Please reload to update')) {
 						newServiceWorker.postMessage({ type: 'SKIP_WAITING' });
 						window.location.reload();
 					}
 				}
 			});
 		});
-	}
+	};
 
 	const handleClickOutside = (e: MouseEvent) => {
 		if (menuRef && !menuRef.contains(e.target as Node)) {
