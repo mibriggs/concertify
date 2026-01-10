@@ -53,35 +53,47 @@
 					const jsonData = (await response.json()) as unknown;
 					const savedTracks: SavedTracks = savedTracksSuccessResponseSchema.parse(jsonData);
 					const newArtists = new Set();
-					savedTracks.items.forEach((song) =>
-						song.track.artists
-							.filter((artist) => !artistIds.has(artist.id))
-							.forEach((artist) => {
-								newArtists.add(artist.id);
-								artistIds.add(artist.id);
-							})
-					);
+					savedTracks.items.forEach((song) => {
+						const primaryArtist = song.track.artists[0];
+						if (primaryArtist && !artistIds.has(primaryArtist.id)) {
+							newArtists.add(primaryArtist.id);
+							artistIds.add(primaryArtist.id);
+						}
+					});
 
 					const ids = Array.from(newArtists).join(',');
 					const fetchUrl = `${SPOTIFY_BASE_URL}/artists?ids=${ids}`;
-					response = await fetch(fetchUrl, {
+					const artistResponse = await fetch(fetchUrl, {
 						method: 'GET',
 						headers: {
 							Authorization: `Bearer ${data.spotifyToken?.access_token}`
 						}
 					});
 
-					if (response.ok) {
-						const jsonData = (await response.json()) as unknown; // need to batch now
+					const newArtistsList: Artist[] = [];
+					if (artistResponse.ok) {
+						const jsonData = (await artistResponse.json()) as unknown;
 						const artistsData = severalArtistsSchema.parse(jsonData);
-						artists = [...artists, ...artistsData.artists];
-						await tick();
-						if (nextUrl) {
-							let newLastCard = container.children[container.childElementCount - 2];
-							observer.observe(newLastCard);
-						}
+						newArtistsList.push(...artistsData.artists);
 					}
+
+					artists = [...artists, ...newArtistsList];
 					nextUrl = savedTracks.next === null ? undefined : savedTracks.next;
+					await tick();
+					if (nextUrl && newArtistsList.length > 0) {
+						const artistCardIndex = artists.length - 2;
+						const allButtons = Array.from(container.querySelectorAll('button'));
+						let newLastCard = allButtons[artistCardIndex];
+						if (newLastCard) observer.observe(newLastCard);
+					} else if (nextUrl && newArtistsList.length === 0) {
+						// No new artists in this batch, fetch next batch immediately
+						isLoadingMore = false;
+						intersectionObserverCallback(
+							[{ isIntersecting: true, target: entries[0].target } as IntersectionObserverEntry],
+							observer
+						);
+						return;
+					}
 				}
 				isLoadingMore = false;
 			}

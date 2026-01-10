@@ -56,15 +56,19 @@
 				isLoadingMore = false;
 				await tick();
 				if (nextUrl !== null) {
-					let newLastCard = container.children[container.childElementCount - 2];
-					observer.observe(newLastCard);
+					const artistCardIndex = artists.length - 2;
+					const allButtons = Array.from(container.querySelectorAll('button'));
+					let newLastCard = allButtons[artistCardIndex];
+					if (newLastCard) observer.observe(newLastCard);
 				}
 			}
 		};
 
 		const options: IntersectionObserverInit = { threshold: 0, rootMargin: '300px' };
 		observer = new IntersectionObserver(intersectionObserverCallback, options);
-		observer.observe(container.children[container.childElementCount - 2]);
+		const allButtons = Array.from(container.querySelectorAll('button'));
+		const initialCard = allButtons[allButtons.length - 2];
+		if (initialCard) observer.observe(initialCard);
 	};
 
 	data.artists.then((firstBatch) => {
