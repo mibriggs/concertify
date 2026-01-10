@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import mapboxgl from 'mapbox-gl';
 	import 'mapbox-gl/dist/mapbox-gl.css';
+	import { PUBLIC_MAPBOX_TOKEN } from '$env/static/public';
 
 	export let longitude: number;
 	export let latitude: number;
@@ -11,10 +12,7 @@
 	let map: mapboxgl.Map;
 
 	onMount(() => {
-		const MAPBOX_TOKEN =
-			'pk.eyJ1Ijoib3dhbmFydXRvIiwiYSI6ImNtMGFrOTNlNzB2dTUybG9oYTM1NTEyc20ifQ.bpgd2R46E_YcpOogQqWhpQ';
-
-		mapboxgl.accessToken = MAPBOX_TOKEN;
+		mapboxgl.accessToken = PUBLIC_MAPBOX_TOKEN;
 
 		map = new mapboxgl.Map({
 			container: mapContainer,

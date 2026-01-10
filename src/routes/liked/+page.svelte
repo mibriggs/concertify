@@ -35,9 +35,9 @@
 	};
 
 	const setupObserver = () => {
-		const intersectionObserverCallback: IntersectionObserverCallback = async (
-			entries,
-			observer
+		const intersectionObserverCallback = async (
+			entries: IntersectionObserverEntry[],
+			observer: IntersectionObserver
 		) => {
 			const artistCard = entries[0];
 			if (artistCard.isIntersecting && nextUrl && !isLoadingMore) {
@@ -99,7 +99,7 @@
 			}
 		};
 
-		const options: IntersectionObserverInit = { threshold: 0, rootMargin: '300px' };
+		const options = { threshold: 0, rootMargin: '300px' };
 		observer = new IntersectionObserver(intersectionObserverCallback, options);
 		observer.observe(container.children[container.childElementCount - 2]);
 	};
@@ -138,7 +138,7 @@
 				<ArtistCard
 					artistImages={artist.images}
 					name={artist.name}
-					popularity={artist.popularity ? artist.popularity : 0}
+					popularity={artist.popularity}
 					genres={artist.genres}
 					followers={artist.followers.total}
 					on:click={() => openModal(indx)}

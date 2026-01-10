@@ -25,7 +25,7 @@
 	let openLocationContainer: HTMLButtonElement;
 	let inputSlider: HTMLInputElement;
 
-	const getAutoCompleteOptions = (e: CustomEvent<any>) => {
+	const getAutoCompleteOptions = (e: CustomEvent<{ value: string }>) => {
 		const value = e.detail.value;
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(async () => {

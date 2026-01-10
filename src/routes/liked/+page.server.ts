@@ -27,14 +27,14 @@ export const load: PageServerLoad = async ({ locals }) => {
 const getLkedArtistIds = async (
 	accessToken: AccessTokenWithDate
 ): Promise<{ ids: Set<string>; url: string | undefined }> => {
-	let fetchUrl = `${SPOTIFY_BASE_URL}/me/tracks`;
-	let response = await fetch(fetchUrl, {
+	const fetchUrl = `${SPOTIFY_BASE_URL}/me/tracks`;
+	const response = await fetch(fetchUrl, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${accessToken.access_token}`
 		}
 	});
-	let artistIds: Set<string> = new Set();
+	const artistIds: Set<string> = new Set();
 	let nextUrl: undefined | string;
 
 	if (response.ok) {

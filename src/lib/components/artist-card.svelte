@@ -6,13 +6,13 @@
 
 	export let artistImages: ArtistImage[] = [];
 	export let name: string;
-	export let popularity: number;
+	export let popularity: number | undefined;
 	export let genres: string[];
 	export let followers: number;
 
 	$: src = artistImages.length > 0 ? artistImages[0].url : NoImage;
-	$: width = artistImages.length > 0 ? artistImages[0].width : 288;
-	$: height = artistImages.length > 0 ? artistImages[0].height : 320;
+	$: width = artistImages.length > 0 ? artistImages[0].width ?? 288 : 288;
+	$: height = artistImages.length > 0 ? artistImages[0].height ?? 320 : 320;
 </script>
 
 <input type="hidden" name="artist" value={name} />
@@ -23,7 +23,7 @@
 >
 	<img {src} alt="Artist" class="mb-4 rounded-lg shadow-lg" loading="lazy" {width} {height} />
 	<span class="text-xl font-bold">{name}</span>
-	<span class="flex self-start text-sm italic">Popularity: {popularity}</span>
+	<span class="flex self-start text-sm italic">Popularity: {popularity ?? 'N/A'}</span>
 	<span class="flex flex-1 self-start text-wrap text-sm italic">Genres: {genres.join(', ')}</span>
 	<div class="flex items-stretch justify-center gap-2 self-end">
 		<span>{formatNumber(followers)}</span>

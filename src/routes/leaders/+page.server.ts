@@ -1,9 +1,4 @@
-import {
-	type AccessTokenWithDate,
-	type Artist,
-	severalArtistsSchema,
-	top50SongsSchema
-} from '$lib/types';
+import { type AccessTokenWithDate, top50SongsSchema } from '$lib/types';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { SPOTIFY_BASE_URL } from '$lib';
@@ -43,7 +38,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
-	const artistIds = Array.from(await getTopArtistIds(accessToken));
 
 	return {
 		artistIds: getTopArtistIds(accessToken),

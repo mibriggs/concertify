@@ -32,9 +32,9 @@
 	};
 
 	const setupObserver = () => {
-		const intersectionObserverCallback: IntersectionObserverCallback = async (
-			entries,
-			observer
+		const intersectionObserverCallback = async (
+			entries: IntersectionObserverEntry[],
+			observer: IntersectionObserver
 		) => {
 			let lastCard = entries[0];
 			if (lastCard.isIntersecting && nextUrl !== null && !isLoadingMore) {
@@ -64,7 +64,7 @@
 			}
 		};
 
-		const options: IntersectionObserverInit = { threshold: 0, rootMargin: '300px' };
+		const options = { threshold: 0, rootMargin: '300px' };
 		observer = new IntersectionObserver(intersectionObserverCallback, options);
 		const allButtons = Array.from(container.querySelectorAll('button'));
 		const initialCard = allButtons[allButtons.length - 2];
@@ -107,7 +107,7 @@
 				<ArtistCard
 					artistImages={artist.images}
 					name={artist.name}
-					popularity={artist.popularity ? artist.popularity : 0}
+					popularity={artist.popularity}
 					genres={artist.genres}
 					followers={artist.followers.total}
 					on:click={() => openModal(indx)}

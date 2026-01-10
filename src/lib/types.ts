@@ -11,8 +11,8 @@ const followersSchema = z.object({
 
 const imageSchema = z.object({
 	url: z.string(),
-	height: z.number(),
-	width: z.number()
+	height: z.number().optional(),
+	width: z.number().optional()
 });
 
 const restrictionsSchema = z.object({
@@ -20,9 +20,9 @@ const restrictionsSchema = z.object({
 });
 
 const externalIdsSchema = z.object({
-	isrc: z.string(),
-	ean: z.string(),
-	upc: z.string()
+	isrc: z.string().optional(),
+	ean: z.string().optional(),
+	upc: z.string().optional()
 });
 
 const simpleArtistSchema = z.object({
@@ -42,7 +42,7 @@ const artistSchema = z.object({
 	id: z.string(),
 	images: imageSchema.array(),
 	name: z.string(),
-	popularity: z.number(),
+	popularity: z.number().optional(),
 	type: z.literal('artist'),
 	uri: z.string()
 });
@@ -67,7 +67,7 @@ const albumSchema = z.object({
 	name: z.string(),
 	release_date: z.string(),
 	release_date_precision: z.enum(['year', 'month', 'day']),
-	restriction: restrictionsSchema,
+	restriction: restrictionsSchema.optional(),
 	type: z.literal('album'),
 	uri: z.string(),
 	artists: simpleArtistSchema.array()
@@ -76,17 +76,17 @@ const albumSchema = z.object({
 const trackSchema = z.object({
 	album: albumSchema,
 	artists: artistSchema.array(),
-	available_markets: z.string().array(),
+	available_markets: z.string().array().optional(),
 	disc_number: z.number(),
 	duration_ms: z.number(),
 	explicit: z.boolean(),
-	external_ids: externalIdsSchema,
+	external_ids: externalIdsSchema.optional(),
 	external_urls: externalUrlSchema,
 	href: z.string(),
 	id: z.string(),
-	is_playable: z.boolean(),
-	linked_from: z.object({}),
-	restrictions: restrictionsSchema,
+	is_playable: z.boolean().optional(),
+	linked_from: z.object({}).optional(),
+	restrictions: restrictionsSchema.optional(),
 	name: z.string(),
 	popularity: z.number(),
 	preview_url: z.string().nullable(),
