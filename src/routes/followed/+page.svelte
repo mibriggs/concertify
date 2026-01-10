@@ -95,7 +95,10 @@
 	</ArtistGallery>
 {:else}
 	<ArtistGallery label="Artists you Follow">
-		<div class="flex flex-wrap items-center justify-center" bind:this={container}>
+		<div
+			class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4"
+			bind:this={container}
+		>
 			{#each artists as artist, indx}
 				<ArtistCard
 					artistImages={artist.images}

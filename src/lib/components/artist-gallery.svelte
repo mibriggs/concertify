@@ -7,7 +7,7 @@
 		type Suggestion
 	} from '$lib/types';
 	import SearchBar from '$components/search-bar.svelte';
-	import { Locate, Navigation } from 'lucide-svelte';
+	import { Locate, Navigation, Filter } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
 	import { geoHashStore, radiusStore } from '$lib/stores/store';
 	import { encodeBase32 } from 'geohashing';
@@ -120,10 +120,16 @@
 <main class="flex flex-col font-mono text-white">
 	<div class="sticky top-20 z-10 flex flex-col gap-2 bg-spotiblack py-3">
 		<!-- For larger screens -->
-		<div class="hidden items-center justify-between pl-8 md:flex">
+		<div class="hidden items-center justify-between gap-4 pl-8 pr-8 md:flex">
 			<span class="sm:text-md text-sm font-bold md:text-xl">{label}</span>
-			<div class="w-5/12">
-				<!-- <SearchBar id="search" placeholder="Search artists..." bind:value={searchValue} /> -->
+			<div class="flex w-6/12 items-center gap-2">
+				<SearchBar id="search" placeholder="Search artists..." bind:value={searchValue} />
+				<button
+					class="flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-colors hover:bg-stone-600"
+				>
+					<Filter size="20" />
+					<span>Filter</span>
+				</button>
 			</div>
 		</div>
 
@@ -131,10 +137,16 @@
 		<div class="flex flex-col items-center justify-center gap-2 px-6 md:hidden">
 			<div class="flex w-full items-center justify-between gap-2">
 				<span class="sm:text-md text-sm font-bold md:text-xl">{label}</span>
+				<button
+					class="flex items-center rounded-lg bg-stone-700 p-2 text-white transition-colors hover:bg-stone-600"
+					aria-label="Filter"
+				>
+					<Filter size="20" />
+				</button>
 			</div>
-			<!-- <div class="w-full">
+			<div class="w-full">
 				<SearchBar id="search-mobile" placeholder="Search artists..." bind:value={searchValue} />
-			</div> -->
+			</div>
 		</div>
 	</div>
 
