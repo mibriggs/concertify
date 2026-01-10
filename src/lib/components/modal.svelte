@@ -1,23 +1,26 @@
 <script lang="ts">
 	import { MapPinned, Calendar, X } from 'lucide-svelte';
 	import { concertEventSuccessSchema, type Artist, type Concert } from '../types';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
 	import { geoHashStore, radiusStore } from '$lib/stores/store';
 	import VenueMap from './venue-map.svelte';
 
-	export let artist: Artist;
-	export let isModalOpen: boolean;
+	interface Props {
+		artist: Artist;
+		isModalOpen: boolean;
+		onModalClose: () => void;
+	}
 
-	let modal: HTMLDialogElement;
-	let isClosing: boolean = false;
-	let isLoading: boolean = false;
-	let concert: Concert;
+	let { artist, isModalOpen, onModalClose }: Props = $props();
 
-	const dispatch = createEventDispatcher();
+	let modal: HTMLDialogElement | undefined = $state();
+	let isClosing: boolean = $state(false);
+	let isLoading: boolean = $state(false);
+	let concert: Concert | undefined = $state();
 
 	onMount(() => {
-		modal.addEventListener('click', closeWithOutsideTap);
+		modal?.addEventListener('click', closeWithOutsideTap);
 	});
 
 	const closeWithOutsideTap = (event: MouseEvent) => {
@@ -29,13 +32,13 @@
 
 	const closeModal = () => {
 		isClosing = true;
-		modal.addEventListener('animationend', closeModalHelper, { once: true });
-		dispatch('modalClose');
+		modal?.addEventListener('animationend', closeModalHelper, { once: true });
+		onModalClose();
 	};
 
 	const closeModalHelper = () => {
 		isClosing = false;
-		modal.close();
+		modal?.close();
 	};
 
 	const fetchData = async () => {
@@ -79,26 +82,30 @@
 		}
 	};
 
-	$: if (isModalOpen) {
-		fetchData();
-	}
+	$effect(() => {
+		if (isModalOpen) {
+			fetchData();
+		}
+	});
 
-	$: if (isModalOpen) {
-		const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-		const scrollY = window.scrollY;
+	$effect(() => {
+		if (isModalOpen) {
+			const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+			const scrollY = window.scrollY;
 
-		document.body.style.position = 'fixed';
-		document.body.style.top = `-${scrollY}px`;
-		document.body.style.width = '100%';
-		document.body.style.paddingRight = `${scrollbarWidth}px`;
-	} else {
-		const scrollY = document.body.style.top;
-		document.body.style.position = '';
-		document.body.style.top = '';
-		document.body.style.width = '';
-		document.body.style.paddingRight = '';
-		window.scrollTo(0, parseInt(scrollY || '0') * -1);
-	}
+			document.body.style.position = 'fixed';
+			document.body.style.top = `-${scrollY}px`;
+			document.body.style.width = '100%';
+			document.body.style.paddingRight = `${scrollbarWidth}px`;
+		} else {
+			const scrollY = document.body.style.top;
+			document.body.style.position = '';
+			document.body.style.top = '';
+			document.body.style.width = '';
+			document.body.style.paddingRight = '';
+			window.scrollTo(0, parseInt(scrollY || '0') * -1);
+		}
+	});
 </script>
 
 <dialog
@@ -112,18 +119,18 @@
 	>
 		<button
 			class=" absolute right-2 top-2 h-fit w-fit rounded-full bg-red-500 p-1 text-white"
-			on:click={closeModal}
+			onclick={closeModal}
 		>
 			<X />
 		</button>
 		{#if isLoading}
 			<div class=" flex w-full flex-col gap-2 px-4">
-				<div class="h-6 w-1/4 animate-skeleton self-center rounded-sm opacity-70" />
-				<div class="h-6 w-8/12 animate-skeleton rounded-sm opacity-70" />
-				<div class="h-6 w-1/2 animate-skeleton self-center rounded-sm opacity-70" />
-				<div class="h-6 w-1/4 animate-skeleton rounded-sm opacity-70" />
-				<div class="h-6 w-1/4 animate-skeleton rounded-sm opacity-70" />
-				<div class="h-6 w-1/4 animate-skeleton self-end rounded-sm opacity-70" />
+				<div class="h-6 w-1/4 animate-skeleton self-center rounded-sm opacity-70"></div>
+				<div class="h-6 w-8/12 animate-skeleton rounded-sm opacity-70"></div>
+				<div class="h-6 w-1/2 animate-skeleton self-center rounded-sm opacity-70"></div>
+				<div class="h-6 w-1/4 animate-skeleton rounded-sm opacity-70"></div>
+				<div class="h-6 w-1/4 animate-skeleton rounded-sm opacity-70"></div>
+				<div class="h-6 w-1/4 animate-skeleton self-end rounded-sm opacity-70"></div>
 			</div>
 		{:else}
 			{#if artist}
@@ -215,13 +222,17 @@
 	}
 
 	#modal[open] {
-		animation: slide-up 350ms forwards, fade-in 350ms forwards;
+		animation:
+			slide-up 350ms forwards,
+			fade-in 350ms forwards;
 	}
 
 	#modal[data-closing='true'] {
 		display: block;
 		pointer-events: none;
 		inset: 0;
-		animation: slide-down 275ms forwards, fade-out 275ms forwards;
+		animation:
+			slide-down 275ms forwards,
+			fade-out 275ms forwards;
 	}
 </style>

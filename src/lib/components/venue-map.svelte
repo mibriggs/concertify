@@ -4,11 +4,15 @@
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import { PUBLIC_MAPBOX_TOKEN } from '$env/static/public';
 
-	export let longitude: number;
-	export let latitude: number;
-	export let venueName: string = '';
+	interface Props {
+		longitude: number;
+		latitude: number;
+		venueName?: string;
+	}
 
-	let mapContainer: HTMLDivElement;
+	let { longitude, latitude, venueName = '' }: Props = $props();
+
+	let mapContainer: HTMLDivElement | string = $state('');
 	let map: mapboxgl.Map;
 
 	onMount(() => {
@@ -49,7 +53,7 @@
 	});
 </script>
 
-<div bind:this={mapContainer} class="h-64 w-full rounded-lg" />
+<div bind:this={mapContainer} class="h-64 w-full rounded-lg"></div>
 
 <style>
 	:global(.mapboxgl-popup-close-button) {
@@ -80,7 +84,9 @@
 
 	:global(.mapboxgl-popup-content) {
 		border-radius: 8px;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		box-shadow:
+			0 4px 6px -1px rgba(0, 0, 0, 0.1),
+			0 2px 4px -1px rgba(0, 0, 0, 0.06);
 		padding-right: 32px !important;
 	}
 </style>

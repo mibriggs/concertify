@@ -1,5 +1,9 @@
 <script lang="ts">
-	export let message: string = 'Loading more artists...';
+	interface Props {
+		message?: string;
+	}
+
+	let { message = 'Loading more artists...' }: Props = $props();
 </script>
 
 <div class="col-span-full flex w-full items-center justify-center gap-2 py-8 text-white">

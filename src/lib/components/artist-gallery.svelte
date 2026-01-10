@@ -2,6 +2,7 @@
 	import {
 		mapboxAutomcompleteSchema,
 		mapboxRetrieveSchema,
+		type InputChangeEvent,
 		type MapBoxAutocompleteOptions,
 		type MapBoxGeoJson,
 		type Suggestion
@@ -15,18 +16,23 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { browser } from '$app/environment';
 
-	export let label: string;
+	interface Props {
+		label: string;
+		children?: import('svelte').Snippet;
+	}
+
+	let { label, children }: Props = $props();
 
 	let debounceTimer: number | undefined;
-	let searchValue: string = '';
-	let isOpen: boolean = false;
-	let mapboxSuggestions: Suggestion[] = [];
-	let editLocationContainer: HTMLDivElement;
-	let openLocationContainer: HTMLButtonElement;
-	let inputSlider: HTMLInputElement;
+	let searchValue: string = $state('');
+	let isOpen: boolean = $state(false);
+	let mapboxSuggestions: Suggestion[] = $state([]);
+	let editLocationContainer: HTMLDivElement | undefined = $state();
+	let openLocationContainer: HTMLButtonElement | undefined = $state();
+	let inputSlider: HTMLInputElement | undefined = $state();
 
-	const getAutoCompleteOptions = (e: CustomEvent<{ value: string }>) => {
-		const value = e.detail.value;
+	const getAutoCompleteOptions = (e: InputChangeEvent) => {
+		const value = e.currentTarget.value;
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(async () => {
 			try {
@@ -93,7 +99,7 @@
 	};
 
 	const closeLocationMenu = (e: TouchEvent) => {
-		if (editLocationContainer && e.target instanceof Node && !inputSlider.contains(e.target)) {
+		if (editLocationContainer && e.target instanceof Node && !inputSlider?.contains(e.target)) {
 			editLocationContainer.classList.remove('show');
 			editLocationContainer.classList.add('hide');
 			isOpen = false;
@@ -113,8 +119,6 @@
 			document.removeEventListener('touchmove', closeLocationMenu);
 		}
 	});
-
-	$: console.log(isOpen);
 </script>
 
 <main class="flex flex-col font-mono text-white">
@@ -123,7 +127,13 @@
 		<div class="hidden items-center justify-between gap-4 pl-8 pr-8 md:flex">
 			<span class="sm:text-md text-sm font-bold md:text-xl">{label}</span>
 			<div class="flex w-6/12 items-center gap-2">
-				<SearchBar id="search" placeholder="Search artists..." bind:value={searchValue} />
+				<SearchBar
+					id="search"
+					placeholder="Search artists..."
+					bind:value={searchValue}
+					onInputChange={() => console.log('input changed')}
+					onSearchCanceled={() => console.log('search cancelled')}
+				/>
 				<button
 					class="flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-colors hover:bg-stone-600"
 				>
@@ -145,12 +155,18 @@
 				</button>
 			</div>
 			<div class="w-full">
-				<SearchBar id="search-mobile" placeholder="Search artists..." bind:value={searchValue} />
+				<SearchBar
+					id="search-mobile"
+					placeholder="Search artists..."
+					bind:value={searchValue}
+					onInputChange={() => console.log('input changed')}
+					onSearchCanceled={() => console.log('search cancelled')}
+				/>
 			</div>
 		</div>
 	</div>
 
-	<slot />
+	{@render children?.()}
 
 	{#if isOpen}
 		<div
@@ -178,7 +194,7 @@
 				<button
 					class="flex w-fit items-center gap-1 pt-1"
 					id="current-loc"
-					on:click={getGeoLocation}
+					onclick={getGeoLocation}
 				>
 					<div class="flex items-center justify-center rounded-md bg-spotigreen p-1 text-white">
 						<Navigation />
@@ -193,8 +209,8 @@
 						placeholder="Enter city or location..."
 						shouldFocusOnClear={false}
 						bind:value={$geoHashStore.name}
-						on:inputChange={getAutoCompleteOptions}
-						on:searchCanceled={cancelSearch}
+						onInputChange={getAutoCompleteOptions}
+						onSearchCanceled={cancelSearch}
 					/>
 				</div>
 			</span>
@@ -208,7 +224,7 @@
 						<li>
 							<button
 								class="m-1 flex w-full flex-col justify-center"
-								on:click={() => retrieveLocation(suggestion.mapbox_id, suggestion.name)}
+								onclick={() => retrieveLocation(suggestion.mapbox_id, suggestion.name)}
 							>
 								<h1 class="text-md text-start font-bold">{suggestion.name}</h1>
 								{#if suggestion.full_address}
@@ -229,7 +245,7 @@
 		id="location-trigger"
 		class="fixed bottom-2 right-4 z-50 flex size-14 items-center justify-center self-end rounded-full bg-spotigreen shadow-lg active:opacity-80"
 		bind:this={openLocationContainer}
-		on:click={() => (isOpen = !isOpen)}
+		onclick={() => (isOpen = !isOpen)}
 	>
 		<Locate />
 	</button>

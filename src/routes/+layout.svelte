@@ -9,10 +9,15 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 
-	export let data: LayoutData;
+	interface Props {
+		data: LayoutData;
+		children?: import('svelte').Snippet;
+	}
 
-	let showHamburgerMenu = false;
-	let menuRef: HTMLElement;
+	let { data, children }: Props = $props();
+
+	let showHamburgerMenu = $state(false);
+	let menuRef: HTMLElement | undefined = $state();
 	let currentUrl: string;
 
 	const detectServiceWorkerUpdate = async () => {
@@ -113,7 +118,7 @@
 			class="inline-flex size-fit items-center justify-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
 			aria-controls="navbar-hamburger"
 			aria-expanded="false"
-			on:click={() => (showHamburgerMenu = !showHamburgerMenu)}
+			onclick={() => (showHamburgerMenu = !showHamburgerMenu)}
 		>
 			<span class="sr-only">Open main menu</span>
 			{#if !showHamburgerMenu}
@@ -176,7 +181,7 @@
 	</div>
 </nav>
 
-<slot />
+{@render children?.()}
 
 <style lang="postcss">
 	:global(body) {

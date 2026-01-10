@@ -1,25 +1,31 @@
 <script lang="ts">
+	import type { InputChangeEvent } from '$lib/types';
 	import { X } from 'lucide-svelte';
-	import { createEventDispatcher } from 'svelte';
 	import { scale } from 'svelte/transition';
 
-	export let placeholder: string;
-	export let value: string;
-	export let id: string = '';
-	export let shouldFocusOnClear: boolean = true;
-	let searchBarElement: HTMLElement;
+	interface Props {
+		placeholder: string;
+		value: string;
+		id?: string;
+		shouldFocusOnClear?: boolean;
+		onInputChange: (e: InputChangeEvent) => void;
+		onSearchCanceled: () => void;
+	}
 
-	const dispatch = createEventDispatcher();
-	const dispatchInputChangeEvent = (
-		e: Event & { currentTarget: EventTarget & HTMLInputElement }
-	) => {
-		dispatch('inputChange', { value: e.currentTarget.value });
-	};
+	let {
+		placeholder,
+		value = $bindable(),
+		id = '',
+		shouldFocusOnClear = true,
+		onInputChange,
+		onSearchCanceled
+	}: Props = $props();
+	let searchBarElement: HTMLElement | undefined = $state();
 
 	const clearSearchBar = () => {
-		if (shouldFocusOnClear) searchBarElement.focus();
+		if (shouldFocusOnClear) searchBarElement?.focus();
 		value = '';
-		dispatch('searchCanceled');
+		onSearchCanceled();
 	};
 </script>
 
@@ -30,14 +36,14 @@
 		{id}
 		type="text"
 		class="w-full bg-inherit outline-none"
-		on:input={dispatchInputChangeEvent}
+		oninput={onInputChange}
 		{placeholder}
 		bind:value
 		bind:this={searchBarElement}
 	/>
 	{#if value.length > 0}
 		<button
-			on:click={clearSearchBar}
+			onclick={clearSearchBar}
 			class=" mr-2 flex h-fit w-fit items-center justify-center text-spotiblack"
 			in:scale
 			out:scale

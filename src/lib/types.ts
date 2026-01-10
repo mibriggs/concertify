@@ -375,6 +375,11 @@ export {
 	mapboxRetrieveSchema,
 	ticketMasterAttractionsResponse
 };
+
+export type ButtonClickEvent = MouseEvent & {
+	currentTarget: EventTarget & HTMLButtonElement;
+};
+export type InputChangeEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
 export type FollowedArtists = z.infer<typeof followedArtistsSuccessReponseSchema>;
 export type Artist = z.infer<typeof artistSchema>;
 export type AccessTokens = z.infer<typeof accessTokenSuccessResponseSchema>;

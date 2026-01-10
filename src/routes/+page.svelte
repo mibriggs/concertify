@@ -3,7 +3,11 @@
 	import toast from 'svelte-french-toast';
 	import { afterNavigate, goto } from '$app/navigation';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	afterNavigate(() => {
 		if (data.isSignedOut && data.isSignedOut === true) {
