@@ -3,6 +3,7 @@
 	import ArtistGallery from '$components/artist-gallery.svelte';
 	import ArtistCard from '$components/artist-card.svelte';
 	import Modal from '$components/modal.svelte';
+	import LoadingIndicator from '$components/loading-indicator.svelte';
 	import { onDestroy, tick } from 'svelte';
 	import {
 		followedArtistsSuccessReponseSchema,
@@ -20,6 +21,7 @@
 	let observer: IntersectionObserver;
 	let container: HTMLDivElement;
 	let isPageLoading = true;
+	let isLoadingMore = false;
 
 	const openModal = (artistIndex: number) => {
 		currArtistIndex = artistIndex;
@@ -35,8 +37,9 @@
 			observer
 		) => {
 			let lastCard = entries[0];
-			if (lastCard.isIntersecting && nextUrl !== null) {
+			if (lastCard.isIntersecting && nextUrl !== null && !isLoadingMore) {
 				observer.unobserve(lastCard.target);
+				isLoadingMore = true;
 				const response = await fetch(nextUrl, {
 					method: 'GET',
 					headers: {
@@ -50,9 +53,12 @@
 					const newArtists: Artist[] = artistsData.artists.items;
 					artists = [...artists, ...newArtists];
 				}
+				isLoadingMore = false;
 				await tick();
-				let newLastCard = container.children[container.childElementCount - 2];
-				observer.observe(newLastCard);
+				if (nextUrl !== null) {
+					let newLastCard = container.children[container.childElementCount - 2];
+					observer.observe(newLastCard);
+				}
 			}
 		};
 
@@ -80,7 +86,7 @@
 </script>
 
 {#if isPageLoading}
-	<ArtistGallery label="Top Artists">
+	<ArtistGallery label="Artists you Follow">
 		<div class="flex flex-wrap items-center justify-center">
 			{#each Array(32) as _}
 				<SkeletonCard />
@@ -105,6 +111,9 @@
 				{isModalOpen}
 				on:modalClose={() => (isModalOpen = false)}
 			/>
+			{#if isLoadingMore}
+				<LoadingIndicator />
+			{/if}
 		</div>
 	</ArtistGallery>
 {/if}

@@ -41,9 +41,13 @@ const getLkedArtistIds = async (
 		const data = (await response.json()) as unknown;
 		const savedTracks: SavedTracks = savedTracksSuccessResponseSchema.parse(data);
 		nextUrl = savedTracks.next === null ? undefined : savedTracks.next;
-		savedTracks.items.forEach((song) =>
-			song.track.artists.forEach((artist) => artistIds.add(artist.id))
-		);
+		// Only add the primary artist (first in array) for each song
+		savedTracks.items.forEach((song) => {
+			const primaryArtist = song.track.artists[0];
+			if (primaryArtist) {
+				artistIds.add(primaryArtist.id);
+			}
+		});
 	}
 
 	return { ids: artistIds, url: nextUrl };

@@ -64,7 +64,7 @@
 			data-sveltekit-preload-data
 			class="cutoff-text rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-spotigreen"
 		>
-			Top Artists
+			Trending Artists
 		</a>
 		<a
 			href="/followed"
@@ -134,7 +134,7 @@
 							class="block rounded bg-spotigreen px-3 py-2 text-white"
 							aria-current="page"
 						>
-							Top Artists
+							Trending Artists
 						</a>
 					</li>
 					<li>

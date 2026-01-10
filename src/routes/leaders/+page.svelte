@@ -4,6 +4,7 @@
 	import ArtistCard from '$components/artist-card.svelte';
 	import ArtistGallery from '$components/artist-gallery.svelte';
 	import Modal from '$components/modal.svelte';
+	import LoadingIndicator from '$components/loading-indicator.svelte';
 	import { onDestroy, tick } from 'svelte';
 	import { getTopSongsArtists, SPOTIFY_BASE_URL } from '$lib';
 	import SkeletonCard from '$components/skeleton-card.svelte';
@@ -22,6 +23,7 @@
 	let startIndex = data.start;
 	let endIndex = data.end;
 	let isPageLoading = true;
+	let isLoadingMore = false;
 
 	const openModal = (artistIndex: number) => {
 		currArtistIndex = artistIndex;
@@ -37,8 +39,9 @@
 			observer
 		) => {
 			let lastCard = entries[0];
-			if (lastCard.isIntersecting && nextArtistId) {
+			if (lastCard.isIntersecting && nextArtistId && !isLoadingMore) {
 				observer.unobserve(lastCard.target);
+				isLoadingMore = true;
 				batchNo++;
 				startIndex = endIndex;
 				endIndex = data.count * batchNo;
@@ -61,9 +64,12 @@
 						throw new Error(maybeArtistsData.error.message);
 					}
 				}
+				isLoadingMore = false;
 				await tick();
-				let newLastCard = container.children[container.childElementCount - 2];
-				observer.observe(newLastCard);
+				if (nextArtistId) {
+					let newLastCard = container.children[container.childElementCount - 2];
+					observer.observe(newLastCard);
+				}
 			}
 		};
 
@@ -96,7 +102,7 @@
 </script>
 
 {#if isPageLoading}
-	<ArtistGallery label="Top Artists">
+	<ArtistGallery label="Spotify's Top Artists">
 		<div class="flex flex-wrap items-center justify-center">
 			{#each Array(32) as _}
 				<SkeletonCard />
@@ -104,7 +110,7 @@
 		</div>
 	</ArtistGallery>
 {:else}
-	<ArtistGallery label="Top Artists">
+	<ArtistGallery label="Spotify's Top Artists">
 		<div class="flex flex-wrap items-center justify-center" bind:this={container}>
 			{#each artists as artist, indx}
 				<ArtistCard
@@ -121,6 +127,9 @@
 				{isModalOpen}
 				on:modalClose={() => (isModalOpen = false)}
 			/>
+			{#if isLoadingMore}
+				<LoadingIndicator />
+			{/if}
 		</div>
 	</ArtistGallery>
 {/if}
