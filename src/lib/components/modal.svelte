@@ -13,7 +13,6 @@
 	let isClosing: boolean = false;
 	let isLoading: boolean = false;
 	let concert: Concert;
-	let scrollPosition = 0;
 
 	const dispatch = createEventDispatcher();
 
@@ -85,11 +84,6 @@
 	}
 
 	$: if (isModalOpen) {
-		// scrollPosition = window.scrollY;
-		// document.body.style.position = 'fixed';
-		// document.body.style.top = `-${scrollPosition}px`;
-		// document.body.style.overflow = 'hidden';
-		//
 		const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 		const scrollY = window.scrollY;
 
@@ -98,11 +92,6 @@
 		document.body.style.width = '100%';
 		document.body.style.paddingRight = `${scrollbarWidth}px`;
 	} else {
-		// document.body.style.overflow = '';
-		// document.body.style.position = '';
-		// document.body.style.top = '';
-		// window.scrollTo(0, scrollPosition);
-		//
 		const scrollY = document.body.style.top;
 		document.body.style.position = '';
 		document.body.style.top = '';
