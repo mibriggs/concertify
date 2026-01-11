@@ -3,8 +3,9 @@
 	import { concertEventSuccessSchema, type Artist, type Concert } from '../types';
 	import { onMount } from 'svelte';
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
-	import { geoHashStore, radiusStore } from '$lib/stores/store';
+	import { geoHashStore } from '$lib/stores/store.svelte';
 	import VenueMap from './venue-map.svelte';
+	import { radiusStore } from '$lib/stores/store.svelte';
 
 	interface Props {
 		artist: Artist;
@@ -46,8 +47,8 @@
 		isLoading = true;
 		try {
 			const res = await fetch(
-				`/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${$radiusStore}&loc=${
-					$geoHashStore.geoHash
+				`/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${radiusStore.value}&loc=${
+					geoHashStore.value.geoHash
 				}`
 			);
 			const data = (await res.json()) as unknown;

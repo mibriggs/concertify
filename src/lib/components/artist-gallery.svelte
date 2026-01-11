@@ -10,11 +10,11 @@
 	import SearchBar from '$components/search-bar.svelte';
 	import { Locate, Navigation, Filter } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
-	import { geoHashStore, radiusStore } from '$lib/stores/store';
 	import { encodeBase32 } from 'geohashing';
 	import { getGeoLocation } from '$lib';
 	import { onDestroy, onMount } from 'svelte';
 	import { browser } from '$app/environment';
+	import { geoHashStore, radiusStore } from '$lib/stores/store.svelte';
 
 	interface Props {
 		label: string;
@@ -177,7 +177,7 @@
 			bind:this={editLocationContainer}
 		>
 			<span class="flex flex-col gap-1">
-				<label for="radius" class="italic">Search Radius: {$radiusStore} miles</label>
+				<label for="radius" class="italic">Search Radius: {radiusStore.value} miles</label>
 				<input
 					type="range"
 					min="5"
@@ -185,7 +185,7 @@
 					step="5"
 					id="radius"
 					name="radius"
-					bind:value={$radiusStore}
+					bind:value={radiusStore.value}
 					bind:this={inputSlider}
 				/>
 			</span>
@@ -208,7 +208,7 @@
 						id="city"
 						placeholder="Enter city or location..."
 						shouldFocusOnClear={false}
-						bind:value={$geoHashStore.name}
+						bind:value={geoHashStore.value.name}
 						onInputChange={getAutoCompleteOptions}
 						onSearchCanceled={cancelSearch}
 					/>
