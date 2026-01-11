@@ -185,7 +185,9 @@ const concertStartDateSchema = concertBaseDateSchema.extend({
 const concertDateSchema = z.object({
 	start: concertStartDateSchema,
 	spanMultipleDays: z.boolean(),
-	status: z.object({ code: z.enum(['onsale', 'offsale', 'canceled', 'postponed', 'rescheduled']) }),
+	status: z.object({
+		code: z.enum(['onsale', 'offsale', 'cancelled', 'postponed', 'rescheduled'])
+	}),
 	access: z
 		.object({
 			startDateTime: z.string(),
@@ -242,7 +244,15 @@ const concertEventSuccessSchema = z.object({
 									.array()
 									.optional()
 							})
+							.array(),
+						attractions: z
+							.object({
+								name: z.string(),
+								id: z.string().optional(),
+								type: z.string().optional()
+							})
 							.array()
+							.optional()
 					})
 				})
 				.array()

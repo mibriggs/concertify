@@ -15,6 +15,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { geoHashStore, radiusStore } from '$lib/stores/store.svelte';
+	import { getUpcomingEvents } from '$lib/remote-functions/ticketmaster.remote';
 
 	interface Props {
 		label: string;
@@ -136,6 +137,7 @@
 				/>
 				<button
 					class="flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-colors hover:bg-stone-600"
+					onclick={() => getUpcomingEvents({})}
 				>
 					<Filter size="20" />
 					<span>Filter</span>
@@ -150,6 +152,7 @@
 				<button
 					class="flex items-center rounded-lg bg-stone-700 p-2 text-white transition-colors hover:bg-stone-600"
 					aria-label="Filter"
+					onclick={() => getUpcomingEvents({})}
 				>
 					<Filter size="20" />
 				</button>

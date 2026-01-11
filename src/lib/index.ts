@@ -14,7 +14,7 @@ export const generateRandomString = (length: number) => {
 	return randomString;
 };
 
-export const constructQueryParams = (queryObject: Record<string, string | boolean>) => {
+export const constructQueryParams = (queryObject: Record<string, string | boolean | number>) => {
 	const queryParams: string[] = [];
 	Object.entries(queryObject).forEach((queryParam) => queryParams.push(queryParam.join('=')));
 	return queryParams.join('&');

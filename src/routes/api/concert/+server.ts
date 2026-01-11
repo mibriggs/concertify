@@ -1,6 +1,10 @@
 import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
 import { constructQueryParams, TICKETMASTER_BASE_URL } from '$lib';
-import { ticketMasterAttractionsResponse, type TicketmasterAttractions } from '$lib/types.js';
+import {
+	concertEventSuccessSchema,
+	ticketMasterAttractionsResponse,
+	type TicketmasterAttractions
+} from '$lib/types.js';
 import { json } from '@sveltejs/kit';
 
 export const GET = async ({ url, cookies }) => {
@@ -13,13 +17,28 @@ export const GET = async ({ url, cookies }) => {
 		: '';
 	const geoHashString = cookies.get('geoHash');
 
+	// Set date range: tomorrow to 4 months from today
+	const tomorrow = new Date();
+	tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+	tomorrow.setUTCHours(0, 0, 0, 0);
+
+	const fourMonthsFromToday = new Date();
+	fourMonthsFromToday.setUTCMonth(fourMonthsFromToday.getUTCMonth() + 4);
+	fourMonthsFromToday.setUTCHours(23, 59, 59, 0);
+
+	// Format dates without milliseconds: YYYY-MM-DDTHH:mm:ssZ
+	const startDateTime = tomorrow.toISOString().replace(/\.\d{3}Z$/, 'Z');
+	const endDateTime = fourMonthsFromToday.toISOString().replace(/\.\d{3}Z$/, 'Z');
+
 	const eventQueryParams: Record<string, string> = {
 		classificationName: 'music',
 		apikey: SECRET_TICKETMASTER_TOKEN,
 		keyword: artistName.toLowerCase(),
 		radius,
 		unit: 'miles',
-		sort: 'date,asc'
+		sort: 'date,asc',
+		startDateTime,
+		endDateTime
 	};
 
 	const attractionsQuerParams: Record<string, string> = {
@@ -81,7 +100,25 @@ export const GET = async ({ url, cookies }) => {
 		const eventResponse = await fetch(eventFetchUrl);
 		if (eventResponse.ok) {
 			const data = await eventResponse.json();
-			return json(data, { status: 200 });
+
+			const validatedData = concertEventSuccessSchema.safeParse(data);
+			if (!validatedData.success) {
+				console.error('Failed to parse events response:', validatedData.error);
+				return json({ message: 'Invalid response from Ticketmaster' }, { status: 500 });
+			}
+
+			// Filter to only include events with tickets on sale
+			if (validatedData.data._embedded?.events) {
+				validatedData.data._embedded.events = validatedData.data._embedded.events.filter(
+					(event) => event.dates?.status?.code === 'onsale'
+				);
+				// Update page totals to reflect filtered results
+				if (validatedData.data.page) {
+					validatedData.data.page.totalElements = validatedData.data._embedded.events.length;
+				}
+			}
+
+			return json(validatedData.data, { status: 200 });
 		}
 
 		// same with inner fetch

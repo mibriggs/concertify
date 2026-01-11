@@ -182,7 +182,14 @@
 					Buy Tickets
 				</a>
 			{:else}
-				<div class="text-center italic">No upcoming concerts found in your area</div>
+				<div class="text-center italic px-4">
+					No concerts with tickets on sale found within <span class="font-bold not-italic"
+						>{radiusStore.value} miles</span
+					>
+					of
+					<span class="font-bold not-italic">{geoHashStore.value.name || 'your location'}</span>
+					in the next <span class="font-bold not-italic">4 months</span>
+				</div>
 			{/if}
 		{/if}
 	</div>
