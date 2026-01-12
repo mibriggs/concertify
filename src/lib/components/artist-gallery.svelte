@@ -136,7 +136,7 @@
 					onSearchCanceled={() => console.log('search cancelled')}
 				/>
 				<button
-					class="flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-colors hover:bg-stone-600"
+					class="flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-all hover:bg-stone-600 active:scale-95"
 					onclick={() => getUpcomingEvents({})}
 				>
 					<Filter size="20" />
@@ -150,7 +150,7 @@
 			<div class="flex w-full items-center justify-between gap-2">
 				<span class="sm:text-md text-sm font-bold md:text-xl">{label}</span>
 				<button
-					class="flex items-center rounded-lg bg-stone-700 p-2 text-white transition-colors hover:bg-stone-600"
+					class="flex items-center rounded-lg bg-stone-700 p-2 text-white transition-all hover:bg-stone-600 active:scale-95"
 					aria-label="Filter"
 					onclick={() => getUpcomingEvents({})}
 				>

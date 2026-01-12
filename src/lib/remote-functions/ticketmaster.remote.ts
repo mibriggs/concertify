@@ -1,6 +1,6 @@
 import { query } from '$app/server';
 import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
-import { constructQueryParams, TICKETMASTER_BASE_URL } from '$lib';
+import { constructQueryParams, TICKETMASTER_BASE_URL, getTicketmasterDateRange } from '$lib';
 import { concertEventSuccessSchema } from '$lib/types';
 import z from 'zod';
 
@@ -14,18 +14,7 @@ export const getUpcomingEvents = query(
 		let page = 0;
 		let totalPages = 1;
 
-		// Set date range: tomorrow to 4 months from today
-		const tomorrow = new Date();
-		tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-		tomorrow.setUTCHours(0, 0, 0, 0);
-
-		const fourMonthsFromToday = new Date();
-		fourMonthsFromToday.setUTCMonth(fourMonthsFromToday.getUTCMonth() + 4);
-		fourMonthsFromToday.setUTCHours(23, 59, 59, 0);
-
-		// Format dates without milliseconds: YYYY-MM-DDTHH:mm:ssZ
-		const startDateTime = tomorrow.toISOString().replace(/\.\d{3}Z$/, 'Z');
-		const endDateTime = fourMonthsFromToday.toISOString().replace(/\.\d{3}Z$/, 'Z');
+		const { startDateTime, endDateTime } = getTicketmasterDateRange();
 
 		// Ticketmaster API limit: (page * size) must be less than 1000
 		const MAX_RESULTS = 1000;

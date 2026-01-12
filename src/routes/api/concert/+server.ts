@@ -1,5 +1,5 @@
 import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
-import { constructQueryParams, TICKETMASTER_BASE_URL } from '$lib';
+import { constructQueryParams, TICKETMASTER_BASE_URL, getTicketmasterDateRange } from '$lib';
 import {
 	concertEventSuccessSchema,
 	ticketMasterAttractionsResponse,
@@ -17,18 +17,7 @@ export const GET = async ({ url, cookies }) => {
 		: '';
 	const geoHashString = cookies.get('geoHash');
 
-	// Set date range: tomorrow to 4 months from today
-	const tomorrow = new Date();
-	tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-	tomorrow.setUTCHours(0, 0, 0, 0);
-
-	const fourMonthsFromToday = new Date();
-	fourMonthsFromToday.setUTCMonth(fourMonthsFromToday.getUTCMonth() + 4);
-	fourMonthsFromToday.setUTCHours(23, 59, 59, 0);
-
-	// Format dates without milliseconds: YYYY-MM-DDTHH:mm:ssZ
-	const startDateTime = tomorrow.toISOString().replace(/\.\d{3}Z$/, 'Z');
-	const endDateTime = fourMonthsFromToday.toISOString().replace(/\.\d{3}Z$/, 'Z');
+	const { startDateTime, endDateTime } = getTicketmasterDateRange();
 
 	const eventQueryParams: Record<string, string> = {
 		classificationName: 'music',
