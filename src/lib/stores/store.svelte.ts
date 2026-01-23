@@ -25,3 +25,11 @@ export const geoHashStore = createStore<{ geoHash: string; name: string }>({
 	geoHash: '',
 	name: ''
 });
+
+let loading = $state(false);
+export function getIsLoading() {
+	return loading;
+}
+export function setLoading(newLoading: boolean) {
+	loading = newLoading;
+}

@@ -4,6 +4,7 @@
 	import SearchBar from './search-bar.svelte';
 	import { slide } from 'svelte/transition';
 	import { getUpcomingEvents } from '$lib/remote-functions/ticketmaster.remote';
+	import { setLoading } from '$lib/stores/store.svelte';
 
 	interface Props {
 		options: Record<string, string[]>;
@@ -13,7 +14,19 @@
 
 	let { options, oncancel, class: myClass = undefined }: Props = $props();
 
-	let selected = $state([]);
+	let selected: string[] = $state([]);
+
+	const applyFilters = async () => {
+		if (selected.includes('upcoming concerts')) {
+			oncancel();
+
+			setLoading(true);
+			await getUpcomingEvents({});
+			setLoading(false);
+		} else {
+			oncancel();
+		}
+	};
 </script>
 
 <div
@@ -81,10 +94,7 @@
 			>
 			<button
 				class="rounded-xl px-4 py-2 text-zinc-100 bg-zinc-950 transition-all duration-200 active:scale-90 active:bg-zinc-800 filter-button"
-				onclick={() => {
-					getUpcomingEvents({});
-					oncancel();
-				}}>Apply</button
+				onclick={applyFilters}>Apply</button
 			>
 		</div>
 	</div>
