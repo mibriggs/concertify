@@ -28,9 +28,8 @@ const getTopArtistIds = async (accessToken: AccessTokenWithDate): Promise<Set<st
 			throw new Error(maybePlaylistData.error.message);
 		}
 	} else {
-		const errorData = await response.json();
-		console.error('Error fetching playlist:', errorData);
-		throw new Error('Error fetching playlist:');
+		console.error(`Spotify API error: ${response.status} - ${text}`);
+		throw new Error(`Spotify API error: ${response.status} - ${text}`);
 	}
 };
 
