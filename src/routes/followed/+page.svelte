@@ -6,7 +6,7 @@
 	import SkeletonCard from '$components/skeleton-card.svelte';
 	import { type Artist } from '$lib/types';
 	import { getFollowedArtists } from '$lib/remote-functions/spotify.remote';
-	import { setOnFilterContext, setSelectedFiltersContext } from '$lib/context';
+	import { setOnFilterContext } from '$lib/context';
 	import { geoHashStore, radiusStore, setLoading } from '$lib/stores/store.svelte';
 	import { getUpcomingEvents } from '$lib/remote-functions/ticketmaster.remote';
 
@@ -18,8 +18,6 @@
 	let currArtistIndex: number = $state(-1);
 	let isModalOpen: boolean = $state(false);
 	let isLoadingMore = $state(false);
-
-	setSelectedFiltersContext({ value: [] });
 
 	const openModal = (artistIndex: number) => {
 		currArtistIndex = artistIndex;

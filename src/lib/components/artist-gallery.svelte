@@ -32,6 +32,7 @@
 	let isOpen: boolean = $state(false);
 	let isFilterDropdownOpen: boolean = $state(false);
 	let searchValue: string = $state('');
+	let selectedFilters: string[] = $state([]);
 
 	let mapboxSuggestions: Suggestion[] = $state([]);
 
@@ -161,6 +162,7 @@
 				</button>
 				{#if isFilterDropdownOpen}
 					<FilterOptions
+						bind:selectedFilters
 						options={filters}
 						class="bg-neutral-50"
 						oncancel={() => (isFilterDropdownOpen = false)}
@@ -184,6 +186,7 @@
 				</button>
 				{#if isFilterDropdownOpen}
 					<FilterOptions
+						bind:selectedFilters
 						options={filters}
 						class="top-[55%] right-[6%]"
 						oncancel={() => (isFilterDropdownOpen = false)}

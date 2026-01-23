@@ -13,7 +13,6 @@ const getTopArtistIds = async (accessToken: AccessTokenWithDate): Promise<Set<st
 		}
 	});
 	const text = await response.text();
-	console.log('Spotify raw response:', text, 'Status:', response.status);
 
 	if (response.ok) {
 		const data = JSON.parse(text) as unknown;

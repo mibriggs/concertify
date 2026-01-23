@@ -87,9 +87,7 @@ const isSuccessResponseFromSpotify = (url: URL, cookies: Cookies): boolean => {
 	return false;
 };
 
-const setUsersTokens = async (
-	event: RequestEvent<Partial<Record<string, string>>, string | null>
-): Promise<undefined | AccessTokenWithDate> => {
+const setUsersTokens = async (event: RequestEvent): Promise<undefined | AccessTokenWithDate> => {
 	const { fetch, url } = event;
 
 	const spotifyCode = url.searchParams.get('code') as string;

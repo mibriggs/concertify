@@ -8,7 +8,6 @@
 	import { type Artist, savedTracksSuccessResponseSchema, severalArtistsSchema } from '$lib/types';
 	import { SPOTIFY_BASE_URL } from '$lib';
 	import { createInfiniteScroll } from '$lib/use-infinite-scroll.svelte';
-	import { setSelectedFiltersContext } from '$lib/context';
 
 	interface Props {
 		data: PageData;
@@ -24,8 +23,6 @@
 	let isModalOpen: boolean = $state(false);
 	let initialized = $state(false);
 	let isLoadingMore = $state(false);
-
-	setSelectedFiltersContext({ value: [] });
 
 	const openModal = (artistIndex: number) => {
 		currArtistIndex = artistIndex;

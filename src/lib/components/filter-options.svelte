@@ -2,25 +2,27 @@
 	import { X } from 'lucide-svelte';
 	import { twMerge } from 'tailwind-merge';
 	import { slide } from 'svelte/transition';
-	import { getOnFilterContext, getSelectedFiltersContext } from '$lib/context';
+	import { getOnFilterContext } from '$lib/context';
 
 	interface Props {
 		options: Record<string, string[]>;
 		oncancel: () => void;
 		class?: string;
+		selectedFilters?: string[];
 	}
 
-	let { options, oncancel, class: myClass = undefined }: Props = $props();
-
-	const selectedFilters = getSelectedFiltersContext();
-	let selected: string[] = $state(selectedFilters.value);
+	let {
+		options,
+		oncancel,
+		class: myClass = undefined,
+		selectedFilters = $bindable([])
+	}: Props = $props();
 
 	const onfilter = getOnFilterContext();
 
 	const applyFilters = async () => {
-		selectedFilters.value = selected;
 		oncancel();
-		onfilter(selected);
+		onfilter(selectedFilters);
 	};
 </script>
 
@@ -65,7 +67,7 @@
 							type="checkbox"
 							name={header.toLowerCase()}
 							value={option.toLowerCase()}
-							bind:group={selected}
+							bind:group={selectedFilters}
 						/>
 						{option}
 					</label>
@@ -81,10 +83,9 @@
 		<button
 			class="ring-1 ring-neutral-200 rounded-xl px-2 py-2 transition-all duration-200 active:scale-90 active:bg-neutral-200 filter-button disabled:cursor-not-allowed disabled:opacity-55"
 			onclick={() => {
-				selected = [];
-				selectedFilters.value = [];
+				selectedFilters = [];
 			}}
-			disabled={selected.length === 0}>Clear</button
+			disabled={selectedFilters.length === 0}>Clear</button
 		>
 		<div>
 			<button

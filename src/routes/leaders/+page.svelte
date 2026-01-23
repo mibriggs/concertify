@@ -8,7 +8,6 @@
 	import SkeletonCard from '$components/skeleton-card.svelte';
 	import { getTopSongsArtists, SPOTIFY_BASE_URL } from '$lib';
 	import { createInfiniteScroll } from '$lib/use-infinite-scroll.svelte';
-	import { setSelectedFiltersContext } from '$lib/context';
 
 	interface Props {
 		data: PageData;
@@ -25,8 +24,6 @@
 	let container: HTMLDivElement | undefined = $state();
 	let initialized = $state(false);
 	let isLoadingMore = $state(false);
-
-	setSelectedFiltersContext({ value: [] });
 
 	// Are there more artists to load?
 	let hasMore = $derived(currentEndIndex < artistIds.length);
