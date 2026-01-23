@@ -1,4 +1,4 @@
-import { query } from '$app/server';
+import { getRequestEvent, query } from '$app/server';
 import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
 import { constructQueryParams, TICKETMASTER_BASE_URL, getTicketmasterDateRange } from '$lib';
 import { concertEventSuccessSchema } from '$lib/types';
@@ -7,12 +7,20 @@ import z from 'zod';
 export const getUpcomingEvents = query(
 	z.object({
 		radius: z.number().min(5).max(50).optional().default(30),
-		geoHash: z.string().optional().default('dr5reg')
+		geoHash: z.string().optional()
 	}),
 	async ({ radius, geoHash }) => {
 		const allEvents = [];
 		let page = 0;
 		let totalPages = 1;
+		let geoHashToUse = geoHash ?? '';
+
+		const { cookies } = getRequestEvent();
+		if (!geoHash && cookies.get('geoHash')) {
+			geoHashToUse = cookies.get('geoHash') as string;
+		} else if (!geoHash) {
+			geoHashToUse = 'dr5reg';
+		}
 
 		const { startDateTime, endDateTime } = getTicketmasterDateRange();
 
@@ -27,7 +35,7 @@ export const getUpcomingEvents = query(
 				classificationName: 'music',
 				segmentName: 'Music',
 				source: 'ticketmaster',
-				geoPoint: geoHash,
+				geoPoint: geoHashToUse,
 				radius: radius,
 				unit: 'miles',
 				size: 200,
@@ -92,6 +100,9 @@ export const getUpcomingEvents = query(
 
 		console.log('Total events found:', allEvents.length);
 		console.log('Unique artists:', artistNames.size);
-		artistNames.forEach((name) => console.log(name));
+		console.log('GeoHash in remote function: ', geoHashToUse);
+		const normalizedNames: string[] = [];
+		artistNames.forEach((name) => normalizedNames.push(name.toLowerCase()));
+		return normalizedNames;
 	}
 );

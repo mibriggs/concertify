@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { X } from 'lucide-svelte';
 	import { twMerge } from 'tailwind-merge';
-	import SearchBar from './search-bar.svelte';
 	import { slide } from 'svelte/transition';
-	import { getUpcomingEvents } from '$lib/remote-functions/ticketmaster.remote';
-	import { setLoading } from '$lib/stores/store.svelte';
+	import { getOnFilterContext, getSelectedFiltersContext } from '$lib/context';
 
 	interface Props {
 		options: Record<string, string[]>;
@@ -14,18 +12,15 @@
 
 	let { options, oncancel, class: myClass = undefined }: Props = $props();
 
-	let selected: string[] = $state([]);
+	const selectedFilters = getSelectedFiltersContext();
+	let selected: string[] = $state(selectedFilters.value);
+
+	const onfilter = getOnFilterContext();
 
 	const applyFilters = async () => {
-		if (selected.includes('upcoming concerts')) {
-			oncancel();
-
-			setLoading(true);
-			await getUpcomingEvents({});
-			setLoading(false);
-		} else {
-			oncancel();
-		}
+		selectedFilters.value = selected;
+		oncancel();
+		onfilter(selected);
 	};
 </script>
 
@@ -48,13 +43,13 @@
 				<X />
 			</button>
 		</div>
-		<SearchBar
+		<!-- <SearchBar
 			placeholder="Search filters..."
 			onInputChange={() => {}}
 			onSearchCanceled={() => {}}
 			value=""
 			class="bg-neutral-50 border-2 rounded-lg focus-within:outline-none py-[3px]"
-		/>
+		/> -->
 	</div>
 
 	<!-- Filters -->
@@ -85,7 +80,10 @@
 	<div class="flex items-center justify-between font-semibold text-sm py-2 sticky bottom-0">
 		<button
 			class="ring-1 ring-neutral-200 rounded-xl px-2 py-2 transition-all duration-200 active:scale-90 active:bg-neutral-200 filter-button"
-			onclick={() => (selected = [])}>Clear</button
+			onclick={() => {
+				selected = [];
+				selectedFilters.value = [];
+			}}>Clear</button
 		>
 		<div>
 			<button

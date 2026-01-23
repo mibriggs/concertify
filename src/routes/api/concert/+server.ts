@@ -43,77 +43,114 @@ export const GET = async ({ url, cookies }) => {
 		eventQueryParams.geoPoint = manualGeoHashString;
 	}
 
-	const fetchAttractionsUrl: string = encodeURI(
-		`${TICKETMASTER_BASE_URL}/attractions.json?${constructQueryParams(attractionsQuerParams)}`
-	);
-	const attractionsResponse = await fetch(fetchAttractionsUrl);
+	// Fetch attractions with pagination
+	const allAttractions: Array<{
+		id: string;
+		name?: string;
+		type?: string;
+		upcomingEvents: {
+			_total?: number;
+			_filtered?: number;
+		};
+	}> = [];
+	let attractionPage = 0;
+	let attractionTotalPages = 1;
+	const ATTRACTION_PAGE_SIZE = 20; // Ticketmaster default
 
-	if (attractionsResponse.ok) {
+	while (attractionPage < attractionTotalPages) {
+		attractionsQuerParams.page = attractionPage.toString();
+		attractionsQuerParams.size = ATTRACTION_PAGE_SIZE.toString();
+
+		const fetchAttractionsUrl: string = encodeURI(
+			`${TICKETMASTER_BASE_URL}/attractions.json?${constructQueryParams(attractionsQuerParams)}`
+		);
+
+		const attractionsResponse = await fetch(fetchAttractionsUrl);
+		if (!attractionsResponse.ok) {
+			console.error('Attractions API error:', attractionsResponse.status);
+			break;
+		}
+
 		const data = (await attractionsResponse.json()) as unknown;
 		const attractions: TicketmasterAttractions = ticketMasterAttractionsResponse.parse(data);
-		const matchingAtttractions =
-			attractions.page.totalElements > 0 && attractions._embedded
-				? attractions._embedded?.attractions
-						.filter(
-							(attraction) =>
-								attraction.name && attraction.name.toLowerCase() === artistName.toLowerCase()
-						)
-						.map((attraction) => {
-							return {
-								id: attraction.id,
-								name: attraction.name ? attraction.name : '',
-								upcomingEvents: attraction.upcomingEvents._total
-									? attraction.upcomingEvents._total
-									: 0
-							};
-						})
-						.filter((attraction) => attraction.upcomingEvents > 0)
-				: [];
-		if (matchingAtttractions.length === 0) {
-			return json({
-				page: {
-					totalElements: 0,
-					size: 1,
-					totalPages: 1,
-					number: 0
-				}
-			});
+
+		if (attractionPage === 0) {
+			attractionTotalPages = attractions.page.totalPages;
 		}
 
-		// we know the artist we want has events coming
-		const artistId = matchingAtttractions[0].id;
-		eventQueryParams.attractionId = artistId;
-		const eventFetchUrl: string = encodeURI(
-			`${TICKETMASTER_BASE_URL}/events.json?${constructQueryParams(eventQueryParams)}`
-		);
-		const eventResponse = await fetch(eventFetchUrl);
-		if (eventResponse.ok) {
-			const data = await eventResponse.json();
-
-			const validatedData = concertEventSuccessSchema.safeParse(data);
-			if (!validatedData.success) {
-				console.error('Failed to parse events response:', validatedData.error);
-				return json({ message: 'Invalid response from Ticketmaster' }, { status: 500 });
-			}
-
-			// Filter to only include events with tickets on sale
-			if (validatedData.data._embedded?.events) {
-				validatedData.data._embedded.events = validatedData.data._embedded.events.filter(
-					(event) => event.dates?.status?.code === 'onsale'
-				);
-				// Update page totals to reflect filtered results
-				if (validatedData.data.page) {
-					validatedData.data.page.totalElements = validatedData.data._embedded.events.length;
-				}
-			}
-
-			return json(validatedData.data, { status: 200 });
+		if (attractions._embedded?.attractions) {
+			allAttractions.push(...attractions._embedded.attractions);
 		}
 
-		// same with inner fetch
-		return json({ message: 'An error occurred' }, { status: 400 });
+		attractionPage++;
+
+		// Add delay between requests to avoid rate limiting
+		if (attractionPage < attractionTotalPages) {
+			await new Promise((resolve) => setTimeout(resolve, 200));
+		}
 	}
 
-	// if the initial fetch fails i want to know
+	// Now filter through all attractions we've collected
+	const matchingAtttractions =
+		allAttractions.length > 0
+			? allAttractions
+					.filter(
+						(attraction) =>
+							attraction.name && attraction.name.toLowerCase() === artistName.toLowerCase()
+					)
+					.map((attraction) => {
+						return {
+							id: attraction.id,
+							name: attraction.name ? attraction.name : '',
+							upcomingEvents: attraction.upcomingEvents._total
+								? attraction.upcomingEvents._total
+								: 0
+						};
+					})
+					.filter((attraction) => attraction.upcomingEvents > 0)
+			: [];
+
+	if (matchingAtttractions.length === 0) {
+		return json({
+			page: {
+				totalElements: 0,
+				size: 1,
+				totalPages: 1,
+				number: 0
+			}
+		});
+	}
+
+	// we know the artist we want has events coming
+	const artistId = matchingAtttractions[0].id;
+	eventQueryParams.attractionId = artistId;
+	const eventFetchUrl: string = encodeURI(
+		`${TICKETMASTER_BASE_URL}/events.json?${constructQueryParams(eventQueryParams)}`
+	);
+	const eventResponse = await fetch(eventFetchUrl);
+	if (eventResponse.ok) {
+		const data = (await eventResponse.json()) as unknown;
+
+		const validatedData = concertEventSuccessSchema.safeParse(data);
+		if (!validatedData.success) {
+			console.error('Failed to parse events response:', validatedData.error);
+			return json({ message: 'Invalid response from Ticketmaster' }, { status: 500 });
+		}
+
+		// Filter to only include events with tickets on sale
+		if (validatedData.data._embedded?.events) {
+			validatedData.data._embedded.events = validatedData.data._embedded.events.filter(
+				(event) => event.dates?.status?.code === 'onsale'
+			);
+			// Update page totals to reflect filtered results
+			if (validatedData.data.page) {
+				validatedData.data.page.totalElements = validatedData.data._embedded.events.length;
+			}
+		}
+
+		return json(validatedData.data, { status: 200 });
+	}
+
+	// same with inner fetch
 	return json({ message: 'An error occurred' }, { status: 400 });
 };
