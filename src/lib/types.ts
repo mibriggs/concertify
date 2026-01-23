@@ -235,7 +235,7 @@ const concertEventSuccessSchema = z.object({
 									.optional(),
 								images: z
 									.object({
-										ratio: z.string(),
+										ratio: z.string().optional(),
 										url: z.string(),
 										width: z.number(),
 										height: z.number(),

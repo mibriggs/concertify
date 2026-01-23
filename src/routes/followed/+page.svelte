@@ -58,7 +58,11 @@
 				}
 			}
 
-			console.log(geoHashStore.value);
+			if (initialState.length !== 0) {
+				allArtists = initialState;
+				initialState = [];
+			}
+
 			let radius = radiusStore.value;
 			let geoHash = undefined;
 
@@ -72,7 +76,7 @@
 			initialState = allArtists;
 			allArtists = [...newList];
 			setLoading(false);
-		} else if (selectedFilters.length === 0) {
+		} else if (selectedFilters.length === 0 && initialState.length !== 0) {
 			allArtists = initialState;
 		}
 	});

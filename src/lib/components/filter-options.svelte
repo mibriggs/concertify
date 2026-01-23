@@ -79,11 +79,12 @@
 	<!-- Footer -->
 	<div class="flex items-center justify-between font-semibold text-sm py-2 sticky bottom-0">
 		<button
-			class="ring-1 ring-neutral-200 rounded-xl px-2 py-2 transition-all duration-200 active:scale-90 active:bg-neutral-200 filter-button"
+			class="ring-1 ring-neutral-200 rounded-xl px-2 py-2 transition-all duration-200 active:scale-90 active:bg-neutral-200 filter-button disabled:cursor-not-allowed disabled:opacity-55"
 			onclick={() => {
 				selected = [];
 				selectedFilters.value = [];
-			}}>Clear</button
+			}}
+			disabled={selected.length === 0}>Clear</button
 		>
 		<div>
 			<button
