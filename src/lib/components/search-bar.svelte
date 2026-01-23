@@ -2,6 +2,7 @@
 	import type { InputChangeEvent } from '$lib/types';
 	import { X } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
+	import { twJoin } from 'tailwind-merge';
 
 	interface Props {
 		placeholder: string;
@@ -10,6 +11,7 @@
 		shouldFocusOnClear?: boolean;
 		onInputChange: (e: InputChangeEvent) => void;
 		onSearchCanceled: () => void;
+		class?: string;
 	}
 
 	let {
@@ -18,7 +20,8 @@
 		id = '',
 		shouldFocusOnClear = true,
 		onInputChange,
-		onSearchCanceled
+		onSearchCanceled,
+		class: clazz = undefined
 	}: Props = $props();
 	let searchBarElement: HTMLElement | undefined = $state();
 
@@ -30,7 +33,10 @@
 </script>
 
 <div
-	class="flex w-full items-center justify-between rounded-lg bg-stone-300 bg-search bg-left-center bg-no-repeat py-2 pl-12 text-spotiblack outline outline-2 outline-transparent focus-within:outline-spotigreen"
+	class={twJoin(
+		'flex w-full items-center justify-between rounded-lg bg-stone-300 bg-search bg-left-center bg-no-repeat py-2 pl-12 text-spotiblack outline outline-2 outline-transparent focus-within:outline-spotigreen',
+		clazz
+	)}
 >
 	<input
 		{id}

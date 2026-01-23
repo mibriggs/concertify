@@ -8,26 +8,35 @@
 		type Suggestion
 	} from '$lib/types';
 	import SearchBar from '$components/search-bar.svelte';
-	import { Locate, Navigation, Filter } from 'lucide-svelte';
+	import { ChevronDown, ChevronUp, Locate, Navigation, SlidersHorizontalIcon } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
 	import { encodeBase32 } from 'geohashing';
 	import { getGeoLocation } from '$lib';
 	import { onDestroy, onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { geoHashStore, radiusStore } from '$lib/stores/store.svelte';
-	import { getUpcomingEvents } from '$lib/remote-functions/ticketmaster.remote';
+	import { twJoin } from 'tailwind-merge';
+	import FilterOptions from './filter-options.svelte';
 
 	interface Props {
 		label: string;
 		children?: import('svelte').Snippet;
 	}
 
+	const filters = {
+		concerts: ['upcoming concerts']
+	};
+
 	let { label, children }: Props = $props();
 
-	let debounceTimer: number | undefined;
-	let searchValue: string = $state('');
 	let isOpen: boolean = $state(false);
+	let isFilterDropdownOpen: boolean = $state(false);
+	let searchValue: string = $state('');
+
 	let mapboxSuggestions: Suggestion[] = $state([]);
+
+	let debounceTimer: number | undefined;
+
 	let editLocationContainer: HTMLDivElement | undefined = $state();
 	let openLocationContainer: HTMLButtonElement | undefined = $state();
 	let inputSlider: HTMLInputElement | undefined = $state();
@@ -136,12 +145,27 @@
 					onSearchCanceled={() => console.log('search cancelled')}
 				/>
 				<button
-					class="flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-all hover:bg-stone-600 active:scale-95"
-					onclick={() => getUpcomingEvents({})}
+					class={twJoin(
+						'flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-all hover:bg-stone-600 active:scale-95 border relative',
+						isFilterDropdownOpen ? 'border-stone-400 shadow-lg shadow-black/20' : 'border-stone-500'
+					)}
+					onclick={() => (isFilterDropdownOpen = !isFilterDropdownOpen)}
 				>
-					<Filter size="20" />
+					<SlidersHorizontalIcon />
 					<span>Filter</span>
+					{#if isFilterDropdownOpen}
+						<ChevronUp />
+					{:else}
+						<ChevronDown />
+					{/if}
 				</button>
+				{#if isFilterDropdownOpen}
+					<FilterOptions
+						options={filters}
+						class="bg-neutral-50"
+						oncancel={() => (isFilterDropdownOpen = false)}
+					/>
+				{/if}
 			</div>
 		</div>
 
@@ -150,12 +174,21 @@
 			<div class="flex w-full items-center justify-between gap-2">
 				<span class="sm:text-md text-sm font-bold md:text-xl">{label}</span>
 				<button
-					class="flex items-center rounded-lg bg-stone-700 p-2 text-white transition-all hover:bg-stone-600 active:scale-95"
-					aria-label="Filter"
-					onclick={() => getUpcomingEvents({})}
+					class={twJoin(
+						'flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-all duration-200 hover:bg-stone-600 active:scale-90 active:bg-stone-800 border relative filter-button-mobile',
+						isFilterDropdownOpen ? 'border-stone-400 shadow-lg shadow-black/20' : 'border-stone-500'
+					)}
+					onclick={() => (isFilterDropdownOpen = !isFilterDropdownOpen)}
 				>
-					<Filter size="20" />
+					<SlidersHorizontalIcon />
 				</button>
+				{#if isFilterDropdownOpen}
+					<FilterOptions
+						options={filters}
+						class="top-[55%] right-[6%]"
+						oncancel={() => (isFilterDropdownOpen = false)}
+					/>
+				{/if}
 			</div>
 			<div class="w-full">
 				<SearchBar
@@ -287,6 +320,22 @@
 			transform: translateY(0);
 			opacity: 1;
 		}
+	}
+
+	@keyframes tap-feedback {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(0.9);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	.filter-button-mobile:active {
+		animation: tap-feedback 0.2s ease-in-out;
 	}
 
 	/* Getting rid of base range styling */
