@@ -17,6 +17,7 @@
 	import { geoHashStore, radiusStore } from '$lib/stores/store.svelte';
 	import { twJoin } from 'tailwind-merge';
 	import FilterOptions from './filter-options.svelte';
+	import Badge from './badge.svelte';
 
 	interface Props {
 		label: string;
@@ -29,6 +30,7 @@
 
 	let { label, children }: Props = $props();
 
+	let badgeCount: number = $state(0);
 	let isOpen: boolean = $state(false);
 	let isFilterDropdownOpen: boolean = $state(false);
 	let searchValue: string = $state('');
@@ -154,6 +156,10 @@
 				>
 					<SlidersHorizontalIcon />
 					<span>Filter</span>
+					<Badge
+						count={badgeCount}
+						class="bg-slate-50 p-1 text-black text-xs font-semibold rounded-full size-6 flex items-center justify-center"
+					/>
 					{#if isFilterDropdownOpen}
 						<ChevronUp />
 					{:else}
@@ -166,6 +172,7 @@
 						options={filters}
 						class="bg-neutral-50"
 						oncancel={() => (isFilterDropdownOpen = false)}
+						onapply={() => (badgeCount = selectedFilters.length)}
 					/>
 				{/if}
 			</div>
@@ -183,6 +190,10 @@
 					onclick={() => (isFilterDropdownOpen = !isFilterDropdownOpen)}
 				>
 					<SlidersHorizontalIcon />
+					<Badge
+						count={badgeCount}
+						class="bg-slate-50 p-1 text-black text-xs font-semibold rounded-full size-6 flex items-center justify-center"
+					/>
 				</button>
 				{#if isFilterDropdownOpen}
 					<FilterOptions
@@ -190,6 +201,7 @@
 						options={filters}
 						class="top-[55%] right-[6%]"
 						oncancel={() => (isFilterDropdownOpen = false)}
+						onapply={() => (badgeCount = selectedFilters.length)}
 					/>
 				{/if}
 			</div>

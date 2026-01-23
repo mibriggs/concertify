@@ -7,6 +7,7 @@
 	interface Props {
 		options: Record<string, string[]>;
 		oncancel: () => void;
+		onapply?: () => void;
 		class?: string;
 		selectedFilters?: string[];
 	}
@@ -14,6 +15,7 @@
 	let {
 		options,
 		oncancel,
+		onapply = undefined,
 		class: myClass = undefined,
 		selectedFilters = $bindable([])
 	}: Props = $props();
@@ -21,8 +23,13 @@
 	const onfilter = getOnFilterContext();
 
 	const applyFilters = async () => {
+		if (onapply) {
+			onapply();
+		}
 		oncancel();
-		onfilter(selectedFilters);
+		if (onfilter) {
+			onfilter(selectedFilters);
+		}
 	};
 </script>
 
