@@ -2,7 +2,6 @@
 	import ArtistGallery from '$components/artist-gallery.svelte';
 	import ArtistCard from '$components/artist-card.svelte';
 	import Modal from '$components/modal.svelte';
-	import LoadingIndicator from '$components/loading-indicator.svelte';
 	import SkeletonCard from '$components/skeleton-card.svelte';
 	import { type Artist } from '$lib/types';
 	import { getFollowedArtists } from '$lib/remote-functions/spotify.remote';
@@ -17,26 +16,16 @@
 	let nextUrl: string | null = $state(null);
 	let currArtistIndex: number = $state(-1);
 	let isModalOpen: boolean = $state(false);
-	let isLoadingMore = $state(false);
 
-	const openModal = (artistIndex: number) => {
-		currArtistIndex = artistIndex;
-		isModalOpen = true;
-		const modal: HTMLDialogElement | null = document.querySelector('#modal');
-		modal?.showModal();
-	};
+	let loadingComplete: Promise<void> | undefined = $state();
+	let resolveLoading: (() => void) | undefined = $state();
 
-	const loadMoreArtists = async () => {
-		if (!nextUrl || isLoadingMore) return;
-
-		const moreArtists = await getFollowedArtists(nextUrl);
-		allArtists = [...allArtists, ...moreArtists.artists.items];
-		nextUrl = moreArtists.artists.next;
-	};
 	$effect(() => {
+		startLoading();
 		if (followedArtists.ready) {
 			allArtists = followedArtists.current.artists.items;
 			nextUrl = followedArtists.current.artists.next;
+			if (followedArtists.current.artists.next === null) finishLoading();
 		}
 	});
 
@@ -46,15 +35,40 @@
 		}
 	});
 
+	// Create the promise
+	function startLoading() {
+		loadingComplete = new Promise((resolve) => {
+			resolveLoading = resolve;
+		});
+	}
+
+	// Call this when everything is done loading
+	function finishLoading() {
+		if (resolveLoading) resolveLoading();
+	}
+
+	const openModal = (artistIndex: number) => {
+		currArtistIndex = artistIndex;
+		isModalOpen = true;
+		const modal: HTMLDialogElement | null = document.querySelector('#modal');
+		modal?.showModal();
+	};
+
+	const loadMoreArtists = async () => {
+		if (nextUrl === null) return;
+
+		const moreArtists = await getFollowedArtists(nextUrl);
+		allArtists = [...allArtists, ...moreArtists.artists.items];
+		nextUrl = moreArtists.artists.next;
+		if (moreArtists.artists.next === null) finishLoading();
+	};
+
 	setOnFilterContext(async (selectedFilters: string[]) => {
 		if (selectedFilters.includes('upcoming concerts')) {
 			setLoading(true);
-			let stillLoadingArtists = true;
-			while (stillLoadingArtists) {
-				if (allArtists.length > 0 && nextUrl === null) {
-					stillLoadingArtists = false;
-				}
-			}
+			console.time('Fetching upcoming concerts');
+
+			if (loadingComplete !== undefined) await loadingComplete;
 
 			if (initialState.length !== 0) {
 				allArtists = initialState;
@@ -73,6 +87,7 @@
 			);
 			initialState = allArtists;
 			allArtists = [...newList];
+			console.timeEnd('Fetching upcoming concerts');
 			setLoading(false);
 		} else if (selectedFilters.length === 0 && initialState.length !== 0) {
 			allArtists = initialState;
@@ -101,9 +116,6 @@
 					onArtistCardClicked={() => openModal(indx)}
 				/>
 			{/each}
-			{#if isLoadingMore}
-				<LoadingIndicator />
-			{/if}
 		</div>
 	</ArtistGallery>
 
