@@ -1,80 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import {
-	savedTracksSuccessResponseSchema,
-	severalArtistsSchema,
-	type AccessTokenWithDate,
-	type Artist,
-	type SavedTracks
-} from '$lib/types';
-import { SPOTIFY_BASE_URL } from '$lib';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.spotifyAccessTokens) {
 		throw redirect(302, '/login?signedout=true');
 	}
-
-	const accessToken: AccessTokenWithDate = locals.spotifyAccessTokens;
-
-	const { ids, url } = await getLkedArtistIds(accessToken);
-	return {
-		nextUrl: url,
-		artistIds: ids,
-		artists: getLikedSongsArtists(accessToken, ids)
-	};
 };
-
-const getLkedArtistIds = async (
-	accessToken: AccessTokenWithDate
-): Promise<{ ids: Set<string>; url: string | undefined }> => {
-	const fetchUrl = `${SPOTIFY_BASE_URL}/me/tracks`;
-	const response = await fetch(fetchUrl, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${accessToken.access_token}`
-		}
-	});
-	const artistIds: Set<string> = new Set();
-	let nextUrl: undefined | string;
-
-	if (response.ok) {
-		const data = (await response.json()) as unknown;
-		const savedTracks: SavedTracks = savedTracksSuccessResponseSchema.parse(data);
-		nextUrl = savedTracks.next === null ? undefined : savedTracks.next;
-		// Only add the primary artist (first in array) for each song
-		savedTracks.items.forEach((song) => {
-			const primaryArtist = song.track.artists[0];
-			if (primaryArtist) {
-				artistIds.add(primaryArtist.id);
-			}
-		});
-	}
-
-	return { ids: artistIds, url: nextUrl };
-};
-
-const getLikedSongsArtists = async (
-	accessToken: AccessTokenWithDate,
-	artistIds: Set<string>
-): Promise<Artist[] | undefined> => {
-	const ids = Array.from(artistIds).join(',');
-	const fetchUrl = `${SPOTIFY_BASE_URL}/artists?ids=${ids}`;
-	const response = await fetch(fetchUrl, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${accessToken.access_token}`
-		}
-	});
-
-	if (response.ok) {
-		// basically spotify changed their api docs out of nowhere so i can no longer access any spotify controlled playlists. Using some user maintained one https://open.spotify.com/playlist/0Hm1tCeFv45CJkNeIAtrfF?si=BNvxUcjMSl23JG1QM-jWXA
-		const data = (await response.json()) as unknown; // need to batch now
-		const maybeArtistsData = severalArtistsSchema.safeParse(data);
-		if (maybeArtistsData.success) {
-			const artists: Artist[] = maybeArtistsData.data.artists;
-			return artists;
-		} else {
-			throw new Error(maybeArtistsData.error.message);
-		}
-	}
-};
+// basically spotify changed their api docs out of nowhere so i can no longer access any spotify controlled playlists.
+// Using some user maintained one https://open.spotify.com/playlist/0Hm1tCeFv45CJkNeIAtrfF?si=BNvxUcjMSl23JG1QM-jWXA
