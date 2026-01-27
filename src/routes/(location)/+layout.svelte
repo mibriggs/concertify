@@ -15,6 +15,7 @@
 		type Suggestion
 	} from '$lib/types';
 	import { getGeoLocation, US_STATE_ABBREVIATIONS } from '$lib';
+	import { invalidateAll } from '$app/navigation';
 
 	const addressSchema = z.object({
 		'ISO3166-2-lvl4': z.string().optional(),
@@ -199,7 +200,15 @@
 				<button
 					class="flex w-fit items-center gap-1 pt-1"
 					id="current-loc"
-					onclick={getGeoLocation}
+					onclick={async () => {
+						try {
+							const geoHash = await getGeoLocation();
+							geoHashStore.set({ geoHash, name: '' });
+							await invalidateAll();
+						} catch (error) {
+							console.error('Failed to get location:', error);
+						}
+					}}
 				>
 					<div class="flex items-center justify-center rounded-md bg-spotigreen p-1 text-white">
 						<Navigation />

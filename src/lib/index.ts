@@ -82,7 +82,7 @@ export const formatNumber = (numToFormat: number): string => {
 	return newNum;
 };
 
-export const getGeoLocation = () => {
+export const getGeoLocation = (): Promise<string> => {
 	const SECONDS = 1000;
 	const MINUTES = 60;
 	const fiveMinutes = 5 * SECONDS * MINUTES;
@@ -94,21 +94,27 @@ export const getGeoLocation = () => {
 		timeout: tenSeconds
 	};
 
-	if (navigator.geolocation) {
-		navigator.geolocation.watchPosition(onLocationSuccess, onLocationError, options);
-	} else {
-		console.warn('No geolocation support received');
-	}
-};
-
-const onLocationSuccess = (position: GeolocationPosition) => {
-	const coords: GeolocationCoordinates = position.coords;
-	const geoHashString = encodeBase32(coords.latitude, coords.longitude, 9);
-	document.cookie = `geoHash=${geoHashString}; path=/`;
-};
-
-const onLocationError = (err: GeolocationPositionError) => {
-	console.warn(`ERROR(${err.code}): ${err.message}`);
+	return new Promise((resolve, reject) => {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					const coords: GeolocationCoordinates = position.coords;
+					const geoHashString = encodeBase32(coords.latitude, coords.longitude, 9);
+					document.cookie = `geoHash=${geoHashString}; path=/`;
+					resolve(geoHashString);
+				},
+				(err) => {
+					console.warn(`ERROR(${err.code}): ${err.message}`);
+					reject(err);
+				},
+				options
+			);
+		} else {
+			const error = new Error('No geolocation support received');
+			console.warn(error.message);
+			reject(error);
+		}
+	});
 };
 
 export const convertTo12HourFormat = (time24: string | undefined) => {
