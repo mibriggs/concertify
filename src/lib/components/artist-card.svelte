@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { formatNumber } from '$lib';
-	import type { ArtistImage, ButtonClickEvent } from '$lib/types';
+	import type { ArtistImage } from '$lib/types';
 	import { UserCheck } from 'lucide-svelte';
 	import NoImage from '$lib/assets/no-image-found.jpg';
 
@@ -10,7 +10,7 @@
 		popularity: number | undefined;
 		genres: string[];
 		followers: number;
-		onArtistCardClicked: (e: ButtonClickEvent) => void;
+		onArtistCardClicked: (artistName: string) => void;
 	}
 
 	let {
@@ -29,7 +29,7 @@
 
 <button
 	class="m-6 flex w-80 transform flex-col items-center gap-1 rounded-xl bg-stone-500 p-4 text-start transition-all duration-[225ms] hover:scale-[1.08] hover:opacity-60"
-	onclick={onArtistCardClicked}
+	onclick={() => onArtistCardClicked(name)}
 >
 	<img {src} alt="Artist" class="mb-4 rounded-lg shadow-lg" loading="lazy" {width} {height} />
 	<span class="text-xl font-bold">{name}</span>

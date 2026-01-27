@@ -15,8 +15,8 @@
 	let initialState: Artist[] = $state([]);
 	let artistIds: Set<string> = $state(new Set());
 	let nextUrl: string | undefined = $state(undefined);
-	let currArtistIndex: number = $state(-1);
 	let isModalOpen: boolean = $state(false);
+	let artistName: string = $state('');
 
 	let loadingComplete: Promise<void> | undefined = $state();
 	let resolveLoading: (() => void) | undefined = $state();
@@ -50,8 +50,8 @@
 		if (resolveLoading) resolveLoading();
 	}
 
-	const openModal = (artistIndex: number) => {
-		currArtistIndex = artistIndex;
+	const openModal = (clickedArtist: string) => {
+		artistName = clickedArtist;
 		isModalOpen = true;
 		const modal: HTMLDialogElement | null = document.querySelector('#modal');
 		modal?.showModal();
@@ -112,21 +112,17 @@
 {:else if likedArtists.ready}
 	<ArtistGallery label="Artists from Saved Tracks">
 		<div class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4">
-			{#each allArtists as artist, indx}
+			{#each allArtists as artist (artist.id)}
 				<ArtistCard
 					artistImages={artist.images}
 					name={artist.name}
 					popularity={artist.popularity}
 					genres={artist.genres}
 					followers={artist.followers.total}
-					onArtistCardClicked={() => openModal(indx)}
+					onArtistCardClicked={openModal}
 				/>
 			{/each}
 		</div>
-		<Modal
-			{isModalOpen}
-			artist={allArtists[currArtistIndex]}
-			onModalClose={() => (isModalOpen = false)}
-		/>
+		<Modal {isModalOpen} onModalClose={() => (isModalOpen = false)} bind:artistName />
 	</ArtistGallery>
 {/if}

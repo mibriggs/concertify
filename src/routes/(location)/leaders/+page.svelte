@@ -19,7 +19,7 @@
 	let artistIds: string[] = $state([]);
 	let currentEndIndex = $state(0);
 
-	let currArtistIndex: number = $state(-1);
+	let artistName: string = $state('');
 	let isModalOpen: boolean = $state(false);
 	let container: HTMLDivElement | undefined = $state();
 	let initialized = $state(false);
@@ -28,8 +28,8 @@
 	// Are there more artists to load?
 	let hasMore = $derived(currentEndIndex < artistIds.length);
 
-	const openModal = (artistIndex: number) => {
-		currArtistIndex = artistIndex;
+	const openModal = (clickedArtist: string) => {
+		artistName = clickedArtist;
 		isModalOpen = true;
 		const modal: HTMLDialogElement | null = document.querySelector('#modal');
 		modal?.showModal();
@@ -105,24 +105,20 @@
 			class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4"
 			bind:this={container}
 		>
-			{#each artists as artist, indx}
+			{#each artists as artist (artist.id)}
 				<ArtistCard
 					artistImages={artist.images}
 					name={artist.name}
 					popularity={artist.popularity}
 					genres={artist.genres}
 					followers={artist.followers.total}
-					onArtistCardClicked={() => openModal(indx)}
+					onArtistCardClicked={openModal}
 				/>
 			{/each}
 			{#if isLoadingMore}
 				<LoadingIndicator />
 			{/if}
 		</div>
-		<Modal
-			{isModalOpen}
-			artist={artists[currArtistIndex]}
-			onModalClose={() => (isModalOpen = false)}
-		/>
+		<Modal {isModalOpen} bind:artistName onModalClose={() => (isModalOpen = false)} />
 	</ArtistGallery>
 {/if}

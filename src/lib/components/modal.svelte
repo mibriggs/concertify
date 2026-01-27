@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { MapPinned, Calendar, X } from 'lucide-svelte';
-	import { concertEventSuccessSchema, type Artist, type Concert } from '../types';
+	import { concertEventSuccessSchema, type Concert } from '../types';
 	import { onMount } from 'svelte';
 	import { convertTo12HourFormat, makeDateHumanReadable } from '$lib';
 	import { geoHashStore } from '$lib/stores/store.svelte';
@@ -8,12 +8,12 @@
 	import { radiusStore } from '$lib/stores/store.svelte';
 
 	interface Props {
-		artist: Artist;
+		artistName: string;
 		isModalOpen: boolean;
 		onModalClose: () => void;
 	}
 
-	let { artist, isModalOpen, onModalClose }: Props = $props();
+	let { isModalOpen, onModalClose, artistName = $bindable('') }: Props = $props();
 
 	let modal: HTMLDialogElement | undefined = $state();
 	let isClosing: boolean = $state(false);
@@ -43,15 +43,15 @@
 	};
 
 	const fetchData = async () => {
-		if (!artist) return;
+		if (artistName === '') return;
 		isLoading = true;
 		try {
-			const fetchUrl = `/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${radiusStore.value}&loc=${
+			const fetchUrl = `/api/concert?artist=${encodeURIComponent(artistName)}&radius=${radiusStore.value}&loc=${
 				geoHashStore.value.geoHash
 			}`;
 			const res = await fetch(fetchUrl);
 			const data = (await res.json()) as unknown;
-			console.log('API Response for artist:', artist.name, data);
+			console.log('API Response for artist:', artistName, data);
 			// if (!res.ok) {
 			// 	console.error('API failed with status:', res.status, data);
 			// 	// API returned an error, set concert to show "no concerts found"
@@ -133,9 +133,9 @@
 				<div class="h-6 w-1/4 animate-skeleton self-end rounded-sm opacity-70"></div>
 			</div>
 		{:else}
-			{#if artist}
+			{#if artistName !== ''}
 				<div class="py-4 font-semibold">
-					{artist.name}
+					{artistName}
 				</div>
 			{/if}
 			{#if concert && concert.page.totalElements > 0}
