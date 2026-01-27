@@ -6,7 +6,7 @@ import z from 'zod';
 
 export const getUpcomingEvents = query(
 	z.object({
-		radius: z.number().min(5).max(50).optional().default(30),
+		radius: z.number().min(5).max(150).optional().default(50),
 		geoHash: z.string().optional()
 	}),
 	async ({ radius, geoHash }) => {
@@ -29,7 +29,7 @@ export const getUpcomingEvents = query(
 		const PAGE_SIZE = 200;
 		const MAX_PAGES = Math.floor(MAX_RESULTS / PAGE_SIZE); // = 5
 
-		while (page < totalPages && page < MAX_PAGES) {
+		while (page < totalPages && page <= MAX_PAGES) {
 			console.log('Fetching events for chunk: ', page);
 			const queryParams = {
 				classificationName: 'music',
@@ -100,7 +100,6 @@ export const getUpcomingEvents = query(
 
 		console.log('Total events found:', allEvents.length);
 		console.log('Unique artists:', artistNames.size);
-		console.log('GeoHash in remote function: ', geoHashToUse);
 		const normalizedNames: string[] = [];
 		artistNames.forEach((name) => normalizedNames.push(name.toLowerCase()));
 		return normalizedNames;

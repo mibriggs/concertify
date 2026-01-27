@@ -3,6 +3,7 @@
 	import { twMerge } from 'tailwind-merge';
 	import { slide } from 'svelte/transition';
 	import { getOnFilterContext } from '$lib/context';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		options: Record<string, string[]>;
@@ -10,6 +11,7 @@
 		onapply?: () => void;
 		class?: string;
 		selectedFilters?: string[];
+		children?: Snippet;
 	}
 
 	let {
@@ -17,7 +19,8 @@
 		oncancel,
 		onapply = undefined,
 		class: myClass = undefined,
-		selectedFilters = $bindable([])
+		selectedFilters = $bindable([]),
+		children
 	}: Props = $props();
 
 	const onfilter = getOnFilterContext();
@@ -62,7 +65,7 @@
 	</div>
 
 	<!-- Filters -->
-	<div class="flex flex-col gap-2 overflow-y-auto p-1">
+	<div class="flex flex-col gap-3 overflow-y-auto p-1">
 		{#each Object.entries(options) as [header, picks]}
 			<fieldset class="flex flex-col gap-2">
 				<legend class="text-sm font-semibold text-slate-500 uppercase">{header}</legend>
@@ -81,6 +84,10 @@
 				{/each}
 			</fieldset>
 		{/each}
+
+		{#if children}
+			{@render children()}
+		{/if}
 	</div>
 
 	<hr class="-my-3 -mx-3 border-t border-gray-200" />

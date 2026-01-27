@@ -20,7 +20,7 @@ function createStore<T>(defaultVal: T) {
 	};
 }
 
-export const radiusStore = createStore<number>(30);
+export const radiusStore = createStore<number>(50);
 export const geoHashStore = createStore<{ geoHash: string; name: string }>({
 	geoHash: '',
 	name: ''
