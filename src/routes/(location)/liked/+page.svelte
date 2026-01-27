@@ -1,28 +1,54 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import ArtistCard from '$components/artist-card.svelte';
 	import ArtistGallery from '$components/artist-gallery.svelte';
 	import Modal from '$components/modal.svelte';
-	import LoadingIndicator from '$components/loading-indicator.svelte';
 	import SkeletonCard from '$components/skeleton-card.svelte';
-	import { type Artist, savedTracksSuccessResponseSchema, severalArtistsSchema } from '$lib/types';
-	import { SPOTIFY_BASE_URL } from '$lib';
-	import { createInfiniteScroll } from '$lib/use-infinite-scroll.svelte';
+	import { type Artist } from '$lib/types';
+	import { getLikedArtists } from '$lib/remote-functions/spotify.remote';
+	import { setOnFilterContext } from '$lib/context';
+	import { geoHashStore, radiusStore, setLoading } from '$lib/stores/store.svelte';
+	import { getUpcomingEvents } from '$lib/remote-functions/ticketmaster.remote';
 
-	interface Props {
-		data: PageData;
-	}
+	const likedArtists = getLikedArtists(undefined);
 
-	let { data }: Props = $props();
-
-	let artists: Artist[] = $state([]);
+	let allArtists: Artist[] = $state([]);
+	let initialState: Artist[] = $state([]);
 	let artistIds: Set<string> = $state(new Set());
 	let nextUrl: string | undefined = $state(undefined);
-	let container: HTMLDivElement | undefined = $state();
 	let currArtistIndex: number = $state(-1);
 	let isModalOpen: boolean = $state(false);
-	let initialized = $state(false);
-	let isLoadingMore = $state(false);
+
+	let loadingComplete: Promise<void> | undefined = $state();
+	let resolveLoading: (() => void) | undefined = $state();
+
+	$effect(() => console.log(artistIds.size));
+	$effect(() => {
+		startLoading();
+		if (likedArtists.ready) {
+			allArtists = likedArtists.current.artists;
+			nextUrl = likedArtists.current.nextUrl;
+			artistIds = new Set(likedArtists.current.artists.map((artist) => artist.id));
+			if (!likedArtists.current.nextUrl) finishLoading();
+		}
+	});
+
+	$effect(() => {
+		if (nextUrl) {
+			loadMoreArtists();
+		}
+	});
+
+	// Create the promise
+	function startLoading() {
+		loadingComplete = new Promise((resolve) => {
+			resolveLoading = resolve;
+		});
+	}
+
+	// Call this when everything is done loading
+	function finishLoading() {
+		if (resolveLoading) resolveLoading();
+	}
 
 	const openModal = (artistIndex: number) => {
 		currArtistIndex = artistIndex;
@@ -31,84 +57,51 @@
 		modal?.showModal();
 	};
 
-	const loadMore = async (): Promise<void> => {
-		if (!nextUrl || isLoadingMore) return;
+	const loadMoreArtists = async () => {
+		if (!nextUrl) return;
 
-		isLoadingMore = true;
+		const moreArtists = await getLikedArtists(nextUrl);
+		const artistsToAdd = moreArtists.artists.filter((artist) => !artistIds.has(artist.id));
+		allArtists = [...allArtists, ...artistsToAdd];
+		artistIds = new Set([...artistIds, ...artistsToAdd.map((artist) => artist.id)]);
+		nextUrl = moreArtists.nextUrl;
 
-		const response = await fetch(nextUrl, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${data.spotifyToken?.access_token}`
-			}
-		});
-
-		if (!response.ok) {
-			isLoadingMore = false;
-			return;
-		}
-
-		const jsonData = (await response.json()) as unknown;
-		const savedTracks = savedTracksSuccessResponseSchema.parse(jsonData);
-
-		const newArtistIds: string[] = [];
-		savedTracks.items.forEach((song) => {
-			const primaryArtist = song.track.artists[0];
-			if (primaryArtist && !artistIds.has(primaryArtist.id)) {
-				newArtistIds.push(primaryArtist.id);
-				artistIds.add(primaryArtist.id);
-			}
-		});
-
-		nextUrl = savedTracks.next ?? undefined;
-
-		if (newArtistIds.length === 0) {
-			isLoadingMore = false;
-			if (nextUrl) await loadMore();
-			return;
-		}
-
-		const artistResponse = await fetch(
-			`${SPOTIFY_BASE_URL}/artists?ids=${newArtistIds.join(',')}`,
-			{
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${data.spotifyToken?.access_token}`
-				}
-			}
-		);
-
-		if (artistResponse.ok) {
-			const artistJson = (await artistResponse.json()) as unknown;
-			const artistsData = severalArtistsSchema.parse(artistJson);
-			artists = [...artists, ...artistsData.artists];
-		}
-
-		isLoadingMore = false;
+		if (!moreArtists.nextUrl) finishLoading();
 	};
 
-	// Initialize from streamed promise
-	$effect(() => {
-		data.artists.then((firstBatch) => {
-			if (firstBatch) {
-				artists = firstBatch;
-				artistIds = data.artistIds;
-				nextUrl = data.nextUrl;
-				initialized = true;
-			}
-		});
-	});
+	setOnFilterContext(async (selectedFilters: string[]) => {
+		if (selectedFilters.includes('upcoming concerts')) {
+			setLoading(true);
+			console.time('Fetching upcoming concerts');
 
-	// Infinite scroll
-	createInfiniteScroll({
-		container: () => container,
-		itemCount: () => artists.length,
-		hasMore: () => !!nextUrl,
-		loadMore
+			if (loadingComplete !== undefined) await loadingComplete;
+
+			if (initialState.length !== 0) {
+				allArtists = initialState;
+				initialState = [];
+			}
+
+			let radius = radiusStore.value;
+			let geoHash = undefined;
+
+			if (geoHashStore.value.name !== '') {
+				geoHash = geoHashStore.value.geoHash;
+			}
+			const performingArtistNames = await getUpcomingEvents({ geoHash, radius });
+			const newList = allArtists.filter((artist) =>
+				performingArtistNames.includes(artist.name.toLowerCase())
+			);
+			initialState = allArtists;
+			allArtists = [...newList];
+			console.timeEnd('Fetching upcoming concerts');
+			setLoading(false);
+		} else if (selectedFilters.length === 0 && initialState.length !== 0) {
+			allArtists = initialState;
+		}
 	});
 </script>
 
-{#if !initialized}
+{#if likedArtists.loading}
 	<ArtistGallery label="Artists from Saved Tracks">
 		<div class="flex flex-wrap items-center justify-center">
 			{#each Array(32) as _}
@@ -116,13 +109,10 @@
 			{/each}
 		</div>
 	</ArtistGallery>
-{:else}
+{:else if likedArtists.ready}
 	<ArtistGallery label="Artists from Saved Tracks">
-		<div
-			class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4"
-			bind:this={container}
-		>
-			{#each artists as artist, indx}
+		<div class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4">
+			{#each allArtists as artist, indx}
 				<ArtistCard
 					artistImages={artist.images}
 					name={artist.name}
@@ -132,13 +122,10 @@
 					onArtistCardClicked={() => openModal(indx)}
 				/>
 			{/each}
-			{#if isLoadingMore}
-				<LoadingIndicator />
-			{/if}
 		</div>
 		<Modal
 			{isModalOpen}
-			artist={artists[currArtistIndex]}
+			artist={allArtists[currArtistIndex]}
 			onModalClose={() => (isModalOpen = false)}
 		/>
 	</ArtistGallery>

@@ -47,6 +47,7 @@ export const getUpcomingEvents = query(
 			};
 
 			const fetchUrl = `${TICKETMASTER_BASE_URL}/events.json?${constructQueryParams(queryParams)}`;
+			console.log(fetchUrl);
 
 			try {
 				const response = await fetch(fetchUrl);

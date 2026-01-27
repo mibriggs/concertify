@@ -46,11 +46,10 @@
 		if (!artist) return;
 		isLoading = true;
 		try {
-			const res = await fetch(
-				`/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${radiusStore.value}&loc=${
-					geoHashStore.value.geoHash
-				}`
-			);
+			const fetchUrl = `/api/concert?artist=${encodeURIComponent(artist.name)}&radius=${radiusStore.value}&loc=${
+				geoHashStore.value.geoHash
+			}`;
+			const res = await fetch(fetchUrl);
 			const data = (await res.json()) as unknown;
 			console.log('API Response for artist:', artist.name, data);
 			// if (!res.ok) {

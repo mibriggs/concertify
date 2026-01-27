@@ -30,9 +30,10 @@ export const GET = async ({ url, cookies }) => {
 		endDateTime
 	};
 
-	const attractionsQuerParams: Record<string, string> = {
+	const attractionsQueryParams: Record<string, string> = {
 		keyword: artistName,
-		sort: 'relevance,asc',
+		sort: 'relevance,desc',
+		classificationName: 'music',
 		apikey: SECRET_TICKETMASTER_TOKEN
 	};
 
@@ -55,14 +56,14 @@ export const GET = async ({ url, cookies }) => {
 	}> = [];
 	let attractionPage = 0;
 	let attractionTotalPages = 1;
-	const ATTRACTION_PAGE_SIZE = 20; // Ticketmaster default
+	const ATTRACTION_PAGE_SIZE = 50; // NOT Ticketmaster default
 
 	while (attractionPage < attractionTotalPages) {
-		attractionsQuerParams.page = attractionPage.toString();
-		attractionsQuerParams.size = ATTRACTION_PAGE_SIZE.toString();
+		attractionsQueryParams.page = attractionPage.toString();
+		attractionsQueryParams.size = ATTRACTION_PAGE_SIZE.toString();
 
 		const fetchAttractionsUrl: string = encodeURI(
-			`${TICKETMASTER_BASE_URL}/attractions.json?${constructQueryParams(attractionsQuerParams)}`
+			`${TICKETMASTER_BASE_URL}/attractions.json?${constructQueryParams(attractionsQueryParams)}`
 		);
 
 		const attractionsResponse = await fetch(fetchAttractionsUrl);
