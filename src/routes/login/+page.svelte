@@ -19,7 +19,7 @@
 </script>
 
 <main
-	class="flex min-h-screen flex-col items-center justify-center bg-spotiblack px-4 font-mono text-white"
+	class="flex min-h-screen flex-col items-center justify-center bg-spotiblack px-4 font-mono text-zinc-100"
 >
 	<div class="max-w-2xl text-center">
 		<h1 class="mb-6 text-4xl font-bold md:text-6xl">See Your Favorite Artists Live</h1>
@@ -32,7 +32,7 @@
 		<form method="post" action="?/authWithSpotify" use:enhance class="flex justify-center">
 			<button
 				type="submit"
-				class="flex items-center gap-3 rounded-full bg-spotigreen px-8 py-4 text-lg font-semibold text-white transition-all hover:scale-105 hover:bg-green-500"
+				class="flex items-center gap-3 rounded-full bg-spotigreen px-8 py-4 text-lg font-semibold text-zinc-100 transition-all hover:scale-105 hover:bg-green-500"
 			>
 				<svg
 					width="24"

@@ -17,6 +17,6 @@
 	});
 </script>
 
-<main class="flex flex-col items-center justify-start bg-spotiblack font-mono text-white">
+<main class="flex flex-col items-center justify-start bg-spotiblack font-mono text-zinc-100">
 	Home page
 </main>

@@ -70,7 +70,7 @@
 {/if}
 <Toaster />
 <nav
-	class="sticky top-0 z-10 hidden items-center justify-start gap-2 bg-spotiblack p-6 font-mono text-white md:flex"
+	class="sticky top-0 z-10 hidden items-center justify-start gap-2 bg-spotiblack p-6 font-mono text-zinc-100 md:flex"
 >
 	<div class="flex">
 		<a
@@ -102,7 +102,7 @@
 			use:enhance
 			class="signed-in ml-auto self-end rounded-md px-2 py-1 transition-all hover:scale-105 hover:bg-spotigreen"
 		>
-			<button class="cutoff-text text-white">Logout</button>
+			<button class="cutoff-text text-zinc-100">Logout</button>
 		</form>
 	{:else}
 		<a
@@ -117,7 +117,7 @@
 <nav class="sticky top-0 z-[1000] border-gray-200 bg-spotiblack md:hidden">
 	<div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
 		<a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-			<span class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
+			<span class="self-center whitespace-nowrap text-2xl font-semibold text-zinc-100">
 				Concertify
 			</span>
 		</a>
@@ -145,7 +145,7 @@
 					<li>
 						<a
 							href="/leaders"
-							class="block rounded bg-spotigreen px-3 py-2 text-white"
+							class="block rounded bg-spotigreen px-3 py-2 text-zinc-100"
 							aria-current="page"
 						>
 							Trending Artists
@@ -154,7 +154,7 @@
 					<li>
 						<a
 							href="/followed"
-							class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:text-white"
+							class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-zinc-100 md:dark:hover:text-zinc-100"
 						>
 							Followed Artists
 						</a>
@@ -162,7 +162,7 @@
 					<li>
 						<a
 							href="/liked"
-							class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+							class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-zinc-100"
 						>
 							Liked Artists
 						</a>
@@ -171,14 +171,14 @@
 						{#if data.spotifyToken}
 							<form method="post" action="/?/logoutUser" use:enhance class="signed-in">
 								<button
-									class="block w-full rounded px-3 py-2 text-start text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+									class="block w-full rounded px-3 py-2 text-start text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-zinc-100"
 									>Logout</button
 								>
 							</form>
 						{:else}
 							<a
 								href="/login"
-								class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+								class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-zinc-100"
 							>
 								Login
 							</a>

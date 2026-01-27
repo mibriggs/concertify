@@ -119,7 +119,7 @@
 		class="flex w-full flex-col items-center justify-center break-words py-4 font-mono md:text-lg"
 	>
 		<button
-			class=" absolute right-2 top-2 h-fit w-fit rounded-full bg-red-500 p-1 text-white"
+			class=" absolute right-2 top-2 h-fit w-fit rounded-full bg-red-500 p-1 text-zinc-100"
 			onclick={closeModal}
 		>
 			<X />

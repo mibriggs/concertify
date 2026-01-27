@@ -210,7 +210,7 @@
 						}
 					}}
 				>
-					<div class="flex items-center justify-center rounded-md bg-spotigreen p-1 text-white">
+					<div class="flex items-center justify-center rounded-md bg-spotigreen p-1 text-zinc-100">
 						<Navigation />
 					</div>
 					<label for="current-loc" class="cursor-pointer underline">Use my current location</label>

@@ -23,7 +23,7 @@
 	let selectedFilters: string[] = $state([]);
 </script>
 
-<main class="flex flex-col font-mono text-white pb-20">
+<main class="flex flex-col font-mono text-zinc-100 pb-20">
 	<div class="sticky top-20 z-10 flex flex-col gap-2 bg-spotiblack py-3">
 		<!-- For larger screens -->
 		<div class="hidden items-center justify-between gap-4 pl-8 pr-8 md:flex">
@@ -38,7 +38,7 @@
 				/>
 				<button
 					class={twJoin(
-						'flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-all hover:bg-stone-600 active:scale-95 border relative',
+						'flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-zinc-100 transition-all hover:bg-stone-600 active:scale-95 border relative',
 						isFilterDropdownOpen ? 'border-stone-400 shadow-lg shadow-black/20' : 'border-stone-500'
 					)}
 					onclick={() => (isFilterDropdownOpen = !isFilterDropdownOpen)}
@@ -73,7 +73,7 @@
 				<span class="sm:text-md text-sm font-bold md:text-xl">{label}</span>
 				<button
 					class={twJoin(
-						'flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-white transition-all duration-200 hover:bg-stone-600 active:scale-90 active:bg-stone-800 border relative filter-button-mobile',
+						'flex items-center gap-2 rounded-lg bg-stone-700 px-4 py-2 text-zinc-100 transition-all duration-200 hover:bg-stone-600 active:scale-90 active:bg-stone-800 border relative filter-button-mobile',
 						isFilterDropdownOpen ? 'border-stone-400 shadow-lg shadow-black/20' : 'border-stone-500'
 					)}
 					onclick={() => (isFilterDropdownOpen = !isFilterDropdownOpen)}
