@@ -1,32 +1,52 @@
 <script lang="ts">
-	import type { PageData } from './$types';
-	import { severalArtistsSchema, type Artist } from '$lib/types';
+	import type { Artist } from '$lib/types';
 	import ArtistCard from '$components/artist-card.svelte';
 	import ArtistGallery from '$components/artist-gallery.svelte';
 	import Modal from '$components/modal.svelte';
-	import LoadingIndicator from '$components/loading-indicator.svelte';
 	import SkeletonCard from '$components/skeleton-card.svelte';
-	import { getTopSongsArtists, SPOTIFY_BASE_URL } from '$lib';
-	import { createInfiniteScroll } from '$lib/use-infinite-scroll.svelte';
+	import { getArtists, getTopArtists } from '$lib/remote-functions/spotify.remote';
+	import { setOnFilterContext } from '$lib/context';
+	import { geoHashStore, radiusStore, setLoading } from '$lib/stores/store.svelte';
+	import { getUpcomingEvents } from '$lib/remote-functions/ticketmaster.remote';
 
-	interface Props {
-		data: PageData;
-	}
+	const artistIds = getTopArtists();
 
-	let { data }: Props = $props();
+	let allArtists: Artist[] = $state([]);
+	let initialState: Artist[] = $state([]);
 
-	let artists: Artist[] = $state([]);
-	let artistIds: string[] = $state([]);
-	let currentEndIndex = $state(0);
-
-	let artistName: string = $state('');
+	let shouldFetchMore: boolean = $state(false);
 	let isModalOpen: boolean = $state(false);
-	let container: HTMLDivElement | undefined = $state();
-	let initialized = $state(false);
-	let isLoadingMore = $state(false);
 
-	// Are there more artists to load?
-	let hasMore = $derived(currentEndIndex < artistIds.length);
+	let numOfRequests: number = $state(0);
+	let artistName: string = $state('');
+
+	let loadingComplete: Promise<void> | undefined = $state();
+	let resolveLoading: (() => void) | undefined = $state();
+
+	$effect(() => {
+		startLoading();
+		if (artistIds.ready && artistIds.current.ids.length > 0) {
+			getArtists(artistIds.current.ids[0]).then((artists) => {
+				allArtists = [...artists.artists];
+				numOfRequests = artistIds.current.ids.length;
+				shouldFetchMore = artistIds.current.ids.length > 1;
+			});
+		}
+	});
+
+	$effect(() => {
+		if (shouldFetchMore) {
+			loadMoreArtists();
+		}
+	});
+
+	const loadMoreArtists = async () => {
+		for (let i = 1; i < numOfRequests; i++) {
+			const fetchedArtists = await getArtists(artistIds.current?.ids[i] ?? []);
+			allArtists = [...allArtists, ...fetchedArtists.artists];
+		}
+		finishLoading();
+	};
 
 	const openModal = (clickedArtist: string) => {
 		artistName = clickedArtist;
@@ -35,63 +55,51 @@
 		modal?.showModal();
 	};
 
-	const loadMore = async () => {
-		if (!hasMore || isLoadingMore) return;
-
-		isLoadingMore = true;
-
-		const startIndex = currentEndIndex;
-		const endIndex = Math.min(currentEndIndex + data.count, artistIds.length);
-		const ids = artistIds.slice(startIndex, endIndex).join(',');
-
-		const response = await fetch(`${SPOTIFY_BASE_URL}/artists?ids=${ids}`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${data.spotifyToken?.access_token}`
-			}
+	// Create the promise
+	function startLoading() {
+		loadingComplete = new Promise((resolve) => {
+			resolveLoading = resolve;
 		});
+	}
 
-		if (response.ok) {
-			const json = (await response.json()) as unknown;
-			const result = severalArtistsSchema.safeParse(json);
-			if (result.success) {
-				artists = [...artists, ...result.data.artists];
-				currentEndIndex = endIndex;
-			} else {
-				throw new Error(result.error.message);
+	// Call this when everything is done loading
+	function finishLoading() {
+		if (resolveLoading) resolveLoading();
+	}
+
+	setOnFilterContext(async (selectedFilters: string[]) => {
+		if (selectedFilters.includes('upcoming concerts')) {
+			setLoading(true);
+			console.time('Fetching upcoming concerts');
+
+			if (loadingComplete !== undefined) await loadingComplete;
+
+			if (initialState.length !== 0) {
+				allArtists = initialState;
+				initialState = [];
 			}
+
+			let radius = radiusStore.value;
+			let geoHash = undefined;
+
+			if (geoHashStore.value.name !== '') {
+				geoHash = geoHashStore.value.geoHash;
+			}
+			const performingArtistNames = await getUpcomingEvents({ geoHash, radius });
+			const newList = allArtists.filter((artist) =>
+				performingArtistNames.includes(artist.name.toLowerCase())
+			);
+			initialState = allArtists;
+			allArtists = [...newList];
+			console.timeEnd('Fetching upcoming concerts');
+			setLoading(false);
+		} else if (selectedFilters.length === 0 && initialState.length !== 0) {
+			allArtists = initialState;
 		}
-
-		isLoadingMore = false;
-	};
-
-	// Initialize from streamed promise
-	$effect(() => {
-		data.artistIds.then((ids) => {
-			artistIds = Array.from(ids);
-
-			if (data.spotifyToken) {
-				getTopSongsArtists(data.spotifyToken, artistIds.slice(0, data.count)).then((firstBatch) => {
-					if (firstBatch) {
-						artists = firstBatch;
-						currentEndIndex = data.count;
-						initialized = true;
-					}
-				});
-			}
-		});
-	});
-
-	// Infinite scroll
-	createInfiniteScroll({
-		container: () => container,
-		itemCount: () => artists.length,
-		hasMore: () => hasMore,
-		loadMore
 	});
 </script>
 
-{#if !initialized}
+{#if (artistIds.loading && allArtists.length === 0) || (artistIds.ready && allArtists.length === 0)}
 	<ArtistGallery label="Spotify's Top Artists">
 		<div class="flex flex-wrap items-center justify-center">
 			{#each Array(32) as _}
@@ -99,13 +107,10 @@
 			{/each}
 		</div>
 	</ArtistGallery>
-{:else}
+{:else if artistIds.ready && allArtists.length > 0}
 	<ArtistGallery label="Spotify's Top Artists">
-		<div
-			class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4"
-			bind:this={container}
-		>
-			{#each artists as artist (artist.id)}
+		<div class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4">
+			{#each allArtists as artist (artist.id)}
 				<ArtistCard
 					artistImages={artist.images}
 					name={artist.name}
@@ -115,10 +120,9 @@
 					onArtistCardClicked={openModal}
 				/>
 			{/each}
-			{#if isLoadingMore}
-				<LoadingIndicator />
-			{/if}
 		</div>
 		<Modal {isModalOpen} bind:artistName onModalClose={() => (isModalOpen = false)} />
 	</ArtistGallery>
+{:else}
+	<div class="text-white">Some other state im not sure about</div>
 {/if}

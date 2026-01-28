@@ -21,7 +21,6 @@
 	let loadingComplete: Promise<void> | undefined = $state();
 	let resolveLoading: (() => void) | undefined = $state();
 
-	$effect(() => console.log(artistIds.size));
 	$effect(() => {
 		startLoading();
 		if (likedArtists.ready) {

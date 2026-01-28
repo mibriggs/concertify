@@ -4,6 +4,7 @@ import {
 	followedArtistsSuccessReponseSchema,
 	savedTracksSuccessResponseSchema,
 	severalArtistsSchema,
+	top50SongsSchema,
 	type Artist
 } from '$lib/types';
 import { error } from '@sveltejs/kit';
@@ -68,21 +69,9 @@ export const getLikedArtists = query(z.string().optional(), async (startingUrl) 
 	// Fetch artist details
 	const artists: Artist[] = [];
 	if (artistIds.length > 0) {
-		const artistResponse = await fetch(`${SPOTIFY_BASE_URL}/artists?ids=${artistIds.join(',')}`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${locals.spotifyAccessTokens.access_token}`
-			}
-		});
+		const fetchedArtists = await getArtists(artistIds);
 
-		if (!artistResponse.ok) error(500, { message: 'Failed to fetch artist details' });
-
-		const artistData = (await artistResponse.json()) as unknown;
-		const maybeArtistsData = severalArtistsSchema.safeParse(artistData);
-
-		if (!maybeArtistsData.success) error(500, { message: maybeArtistsData.error.message });
-
-		maybeArtistsData.data.artists.forEach((artist) => {
+		fetchedArtists.artists.forEach((artist) => {
 			const indxInArtistsArr = artists.findIndex((seenArtist) => seenArtist.id === artist.id);
 			if (indxInArtistsArr === -1) artists.push(artist);
 		});
@@ -92,4 +81,63 @@ export const getLikedArtists = query(z.string().optional(), async (startingUrl) 
 		artists,
 		nextUrl: savedTracks.next ?? undefined
 	};
+});
+
+export const getTopArtists = query(async () => {
+	const { locals } = getRequestEvent();
+
+	if (!locals.spotifyAccessTokens) error(404, { message: 'Spotify access token missing' });
+
+	const topArtistsPlaylistId = '0Hm1tCeFv45CJkNeIAtrfF';
+	const fetchUrl = `${SPOTIFY_BASE_URL}/playlists/${topArtistsPlaylistId}/tracks`;
+	const response = await fetch(fetchUrl, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${locals.spotifyAccessTokens.access_token}`
+		}
+	});
+	const text = await response.text();
+
+	if (!response.ok) {
+		console.error(`Spotify API error: ${response.status} - ${text}`);
+		error(500, { message: `Spotify API error: ${response.status} - ${text}` });
+	}
+
+	const data = JSON.parse(text) as unknown;
+	const maybePlaylistData = top50SongsSchema.safeParse(data);
+
+	if (!maybePlaylistData.success) error(400, { message: maybePlaylistData.error.message });
+
+	const top50SongsArtistIds: string[] = maybePlaylistData.data.items.flatMap((item) => {
+		return item.track.artists.map((artist) => artist.id);
+	});
+
+	const top50Set = [...new Set(top50SongsArtistIds)];
+	const batches: string[][] = [];
+	for (let i = 0; i < top50Set.length; i += 50) {
+		batches.push(top50Set.slice(i, i + 50));
+	}
+	return { ids: batches };
+});
+
+export const getArtists = query(z.string().array(), async (artistIds) => {
+	const { locals } = getRequestEvent();
+
+	if (!locals.spotifyAccessTokens) error(404, { message: 'Spotify access token missing' });
+
+	const artistResponse = await fetch(`${SPOTIFY_BASE_URL}/artists?ids=${artistIds.join(',')}`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${locals.spotifyAccessTokens.access_token}`
+		}
+	});
+
+	if (!artistResponse.ok) error(500, { message: 'Failed to fetch artist details' });
+
+	const artistData = (await artistResponse.json()) as unknown;
+	const maybeArtistsData = severalArtistsSchema.safeParse(artistData);
+
+	if (!maybeArtistsData.success) error(500, { message: maybeArtistsData.error.message });
+
+	return maybeArtistsData.data;
 });
