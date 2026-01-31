@@ -21,9 +21,10 @@ function createStore<T>(defaultVal: T) {
 }
 
 export const radiusStore = createStore<number>(50);
-export const geoHashStore = createStore<{ geoHash: string; name: string }>({
+export const geoHashStore = createStore<{ geoHash: string; name: string; fallback: string }>({
 	geoHash: '',
-	name: ''
+	name: '',
+	fallback: ''
 });
 
 let loading = $state(false);

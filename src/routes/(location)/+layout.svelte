@@ -15,7 +15,6 @@
 		type Suggestion
 	} from '$lib/types';
 	import { getGeoLocation, US_STATE_ABBREVIATIONS } from '$lib';
-	import { invalidateAll } from '$app/navigation';
 
 	const addressSchema = z.object({
 		'ISO3166-2-lvl4': z.string().optional(),
@@ -50,6 +49,8 @@
 	const city = $derived.by(async () => {
 		if (geoHashStore.value.geoHash !== '') {
 			return await getCityFromCoords(geoHashStore.value.geoHash);
+		} else if (geoHashStore.value.fallback !== '') {
+			return await getCityFromCoords(geoHashStore.value.fallback);
 		} else if (data.geoHashCookie) {
 			return await getCityFromCoords(data.geoHashCookie);
 		} else {
@@ -86,7 +87,8 @@
 			} else {
 				const coords: MapBoxGeoJson = maybeCoords.data;
 				const [long, lat] = coords.features[0].geometry.coordinates;
-				geoHashStore.set({ geoHash: encodeBase32(lat, long, 9), name });
+				const fallback = geoHashStore.value.fallback;
+				geoHashStore.set({ geoHash: encodeBase32(lat, long, 9), name, fallback });
 			}
 			mapboxSuggestions = [];
 		} catch (error) {
@@ -95,7 +97,8 @@
 	};
 
 	const cancelSearch = () => {
-		geoHashStore.set({ geoHash: '', name: '' });
+		const fallback = geoHashStore.value.fallback;
+		geoHashStore.set({ geoHash: '', name: '', fallback });
 		mapboxSuggestions = [];
 	};
 
@@ -203,8 +206,7 @@
 					onclick={async () => {
 						try {
 							const geoHash = await getGeoLocation();
-							geoHashStore.set({ geoHash, name: '' });
-							await invalidateAll();
+							geoHashStore.set({ geoHash, name: '', fallback: geoHash });
 						} catch (error) {
 							console.error('Failed to get location:', error);
 						}
