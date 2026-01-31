@@ -6,15 +6,17 @@
 
 	interface Props {
 		artistImages?: ArtistImage[];
+		id: string;
 		name: string;
 		popularity: number | undefined;
 		genres: string[];
 		followers: number;
-		onArtistCardClicked: (artistName: string) => void;
+		onArtistCardClicked: (artistId: string, artistName: string) => void;
 	}
 
 	let {
 		artistImages = [],
+		id,
 		name,
 		popularity,
 		genres,
@@ -29,7 +31,7 @@
 
 <button
 	class="m-6 flex w-80 transform flex-col items-center gap-1 rounded-xl bg-stone-500 p-4 text-start transition-all duration-[225ms] hover:scale-[1.08] hover:opacity-60"
-	onclick={() => onArtistCardClicked(name)}
+	onclick={() => onArtistCardClicked(id, name)}
 >
 	<img {src} alt="Artist" class="mb-4 rounded-lg shadow-lg" loading="lazy" {width} {height} />
 	<span class="text-xl font-bold">{name}</span>

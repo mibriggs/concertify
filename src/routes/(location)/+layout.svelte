@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { geoHashStore, radiusStore } from '$lib/stores/store.svelte';
-	import { ChevronDown, ChevronUp, MapPinned, Navigation } from 'lucide-svelte';
+	import { ChevronUp, MapPinned, Navigation } from 'lucide-svelte';
 	import type { LayoutProps } from './$types';
 	import { decodeBase32, encodeBase32 } from 'geohashing';
 	import { z } from 'zod/v4';
@@ -280,11 +280,11 @@
 		class="flex size-14 items-center justify-center self-end rounded-full bg-spotigreen shadow-lg active:opacity-80"
 		onclick={() => (isOpen = !isOpen)}
 	>
-		{#if isOpen}
-			<ChevronDown size="28" color="#e4e4e7" />
-		{:else}
-			<ChevronUp size="28" color="#e4e4e7" />
-		{/if}
+		<ChevronUp
+			size="28"
+			color="#e4e4e7"
+			class="transition-transform duration-200 {isOpen ? 'rotate-180' : ''}"
+		/>
 	</button>
 </div>
 

@@ -2,6 +2,7 @@ import { getRequestEvent, query } from '$app/server';
 import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
 import { constructQueryParams, TICKETMASTER_BASE_URL, getTicketmasterDateRange } from '$lib';
 import { concertEventSuccessSchema } from '$lib/types';
+import { error } from '@sveltejs/kit';
 import z from 'zod';
 
 export const getUpcomingEvents = query(
@@ -106,3 +107,97 @@ export const getUpcomingEvents = query(
 		return normalizedNames;
 	}
 );
+
+export const getConcertData = query(
+	z.object({
+		artistId: z.string(),
+		artistName: z.string(),
+		radius: z.number().optional(),
+		loc: z.string().optional()
+	}),
+	async ({ artistId, artistName, radius, loc }) => {
+		console.log('======================== ENTERING REMOTE FUNCTION ========================');
+		console.log(artistId, artistName, radius, loc);
+		let geoHashToUse = '';
+		const { cookies } = getRequestEvent();
+		const concertRadius = radius ?? 30;
+		const cookieGeoHashString = cookies.get('geoHash');
+		const { startDateTime, endDateTime } = getTicketmasterDateRange();
+
+		if (loc) {
+			geoHashToUse = loc;
+		} else if (cookieGeoHashString) {
+			geoHashToUse = cookieGeoHashString;
+		}
+
+		const eventQueryParams: Record<string, string> = {
+			classificationName: 'music',
+			apikey: SECRET_TICKETMASTER_TOKEN,
+			keyword: artistName.toLowerCase(),
+			radius: concertRadius.toString(),
+			unit: 'miles',
+			sort: 'relevance,desc',
+			geoPoint: geoHashToUse,
+			startDateTime,
+			endDateTime
+		};
+
+		const eventFetchUrl: string = encodeURI(
+			`${TICKETMASTER_BASE_URL}/events.json?${constructQueryParams(eventQueryParams)}`
+		);
+		console.log(eventFetchUrl);
+		const eventResponse = await fetch(eventFetchUrl);
+
+		if (!eventResponse.ok) error(400, { message: 'An error occurred' });
+
+		const data = (await eventResponse.json()) as unknown;
+
+		const validatedData = concertEventSuccessSchema.safeParse(data);
+		if (!validatedData.success) {
+			console.error('Failed to parse events response:', validatedData.error);
+			error(500, { message: 'Invalid response from Ticketmaster' });
+		}
+
+		// Filter to only include events with tickets on sale
+		if (validatedData.data._embedded?.events) {
+			validatedData.data._embedded.events = validatedData.data._embedded.events
+				.filter((event) => event.dates?.status?.code === 'onsale')
+				.filter((event) => {
+					return event._embedded.attractions?.some((attraction) => {
+						console.log('======================== IN FILTER ========================');
+						const spotifyUrl =
+							attraction.externalLinks?.spotify?.find((sp) => sp.url.includes(artistId))?.url ?? '';
+						console.log(spotifyUrl);
+						const includesArtistId = spotifyUrl.includes(artistId);
+						return includesArtistId || normalizeName(attraction.name) === normalizeName(artistName);
+					});
+				})
+				.sort((event1, event2) =>
+					compareDates(event1.dates.start.localDate, event2.dates.start.localDate)
+				);
+
+			// Update page totals to reflect filtered results
+			if (validatedData.data.page) {
+				validatedData.data.page.totalElements = validatedData.data._embedded.events.length;
+			}
+		}
+
+		return validatedData.data;
+	}
+);
+
+function compareDates(a?: string, b?: string): number {
+	if (!a && !b) return 0;
+	if (!a) return 1; // a goes after b
+	if (!b) return -1; // b goes after a
+	return a.localeCompare(b);
+}
+
+function normalizeName(name: string) {
+	return name
+		.toLowerCase()
+		.trim()
+		.normalize('NFD') // Decompose accented characters
+		.replace(/[\u0300-\u036f]/g, '') // Remove accent marks
+		.replace(/\s+/g, ' '); // Normalize whitespace
+}

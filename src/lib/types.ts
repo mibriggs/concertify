@@ -249,7 +249,12 @@ const concertEventSuccessSchema = z.object({
 							.object({
 								name: z.string(),
 								id: z.string().optional(),
-								type: z.string().optional()
+								type: z.string().optional(),
+								externalLinks: z
+									.object({
+										spotify: z.object({ url: z.string() }).array().optional()
+									})
+									.optional()
 							})
 							.array()
 							.optional()

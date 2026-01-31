@@ -1,13 +1,13 @@
 <script lang="ts">
 	import ArtistCard from '$components/artist-card.svelte';
 	import ArtistGallery from '$components/artist-gallery.svelte';
-	import Modal from '$components/modal.svelte';
 	import SkeletonCard from '$components/skeleton-card.svelte';
 	import { type Artist } from '$lib/types';
 	import { getLikedArtists } from '$lib/remote-functions/spotify.remote';
 	import { setOnFilterContext } from '$lib/context';
 	import { geoHashStore, radiusStore, setLoading } from '$lib/stores/store.svelte';
 	import { getUpcomingEvents } from '$lib/remote-functions/ticketmaster.remote';
+	import Modal from '$components/modal.svelte';
 
 	const likedArtists = getLikedArtists(undefined);
 
@@ -17,6 +17,7 @@
 	let nextUrl: string | undefined = $state(undefined);
 	let isModalOpen: boolean = $state(false);
 	let artistName: string = $state('');
+	let artistId: string = $state('');
 
 	let loadingComplete: Promise<void> | undefined = $state();
 	let resolveLoading: (() => void) | undefined = $state();
@@ -49,7 +50,8 @@
 		if (resolveLoading) resolveLoading();
 	}
 
-	const openModal = (clickedArtist: string) => {
+	const openModal = (clickedId: string, clickedArtist: string) => {
+		artistId = clickedId;
 		artistName = clickedArtist;
 		isModalOpen = true;
 		const modal: HTMLDialogElement | null = document.querySelector('#modal');
@@ -113,6 +115,7 @@
 		<div class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4">
 			{#each allArtists as artist (artist.id)}
 				<ArtistCard
+					id={artist.id}
 					artistImages={artist.images}
 					name={artist.name}
 					popularity={artist.popularity}
@@ -122,6 +125,7 @@
 				/>
 			{/each}
 		</div>
-		<Modal {isModalOpen} onModalClose={() => (isModalOpen = false)} bind:artistName />
+
+		<Modal {isModalOpen} onModalClose={() => (isModalOpen = false)} bind:artistName bind:artistId />
 	</ArtistGallery>
 {/if}

@@ -2,12 +2,12 @@
 	import type { Artist } from '$lib/types';
 	import ArtistCard from '$components/artist-card.svelte';
 	import ArtistGallery from '$components/artist-gallery.svelte';
-	import Modal from '$components/modal.svelte';
 	import SkeletonCard from '$components/skeleton-card.svelte';
 	import { getArtists, getTopArtists } from '$lib/remote-functions/spotify.remote';
 	import { setOnFilterContext } from '$lib/context';
 	import { geoHashStore, radiusStore, setLoading } from '$lib/stores/store.svelte';
 	import { getUpcomingEvents } from '$lib/remote-functions/ticketmaster.remote';
+	import Modal from '$components/modal.svelte';
 
 	const artistIds = getTopArtists();
 
@@ -19,6 +19,7 @@
 
 	let numOfRequests: number = $state(0);
 	let artistName: string = $state('');
+	let artistId: string = $state('');
 
 	let loadingComplete: Promise<void> | undefined = $state();
 	let resolveLoading: (() => void) | undefined = $state();
@@ -48,11 +49,15 @@
 		finishLoading();
 	};
 
-	const openModal = (clickedArtist: string) => {
+	$effect(() => console.log(isModalOpen));
+
+	const openModal = (clickedId: string, clickedArtist: string) => {
+		artistId = clickedId;
 		artistName = clickedArtist;
+		console.log(clickedId, clickedArtist);
 		isModalOpen = true;
 		const modal: HTMLDialogElement | null = document.querySelector('#modal');
-		modal?.showModal();
+		if (modal !== null) modal.showModal();
 	};
 
 	// Create the promise
@@ -99,7 +104,7 @@
 	});
 </script>
 
-{#if (artistIds.loading && allArtists.length === 0) || (artistIds.ready && allArtists.length === 0)}
+{#if !artistIds.ready || (artistIds.ready && allArtists.length === 0)}
 	<ArtistGallery label="Spotify's Top Artists">
 		<div class="flex flex-wrap items-center justify-center">
 			{#each Array(32) as _}
@@ -112,6 +117,7 @@
 		<div class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4">
 			{#each allArtists as artist (artist.id)}
 				<ArtistCard
+					id={artist.id}
 					artistImages={artist.images}
 					name={artist.name}
 					popularity={artist.popularity}
@@ -121,7 +127,7 @@
 				/>
 			{/each}
 		</div>
-		<Modal {isModalOpen} bind:artistName onModalClose={() => (isModalOpen = false)} />
+		<Modal {isModalOpen} bind:artistId bind:artistName onModalClose={() => (isModalOpen = false)} />
 	</ArtistGallery>
 {:else}
 	<div class="text-white">Some other state im not sure about</div>

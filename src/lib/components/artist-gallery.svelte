@@ -1,6 +1,6 @@
 <script lang="ts">
 	import SearchBar from '$components/search-bar.svelte';
-	import { ChevronDown, ChevronUp, SlidersHorizontalIcon } from 'lucide-svelte';
+	import { ChevronDown, SlidersHorizontalIcon } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
 	import { twJoin } from 'tailwind-merge';
 	import FilterOptions from './filter-options.svelte';
@@ -49,11 +49,12 @@
 						count={badgeCount}
 						class="bg-slate-50 p-1 text-black text-xs font-semibold rounded-full size-6 flex items-center justify-center"
 					/>
-					{#if isFilterDropdownOpen}
-						<ChevronUp />
-					{:else}
-						<ChevronDown />
-					{/if}
+					<ChevronDown
+						class={twJoin(
+							'transition-transform duration-200',
+							isFilterDropdownOpen && 'rotate-180'
+						)}
+					/>
 				</button>
 				{#if isFilterDropdownOpen}
 					<FilterOptions
