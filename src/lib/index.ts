@@ -196,3 +196,12 @@ export const getTopSongsArtists = async (
 		}
 	}
 };
+
+export const normalizeName = (name: string) => {
+	return name
+		.toLowerCase()
+		.trim()
+		.normalize('NFD') // Decompose accented characters
+		.replace(/[\u0300-\u036f]/g, '') // Remove accent marks
+		.replace(/\s+/g, ' '); // Normalize whitespace
+};

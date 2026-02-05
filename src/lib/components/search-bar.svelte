@@ -9,8 +9,9 @@
 		value: string;
 		id?: string;
 		shouldFocusOnClear?: boolean;
-		onInputChange: (e: InputChangeEvent) => void;
 		onSearchCanceled: () => void;
+		onenter?: () => void;
+		onInputChange?: (e: InputChangeEvent) => void;
 		class?: string;
 	}
 
@@ -19,9 +20,10 @@
 		value = $bindable(),
 		id = '',
 		shouldFocusOnClear = true,
-		onInputChange,
-		onSearchCanceled,
-		class: clazz = undefined
+		class: clazz = undefined,
+		onInputChange = undefined,
+		onenter = undefined,
+		onSearchCanceled
 	}: Props = $props();
 	let searchBarElement: HTMLElement | undefined = $state();
 
@@ -42,7 +44,17 @@
 		{id}
 		type="text"
 		class="w-full bg-inherit outline-none"
-		oninput={onInputChange}
+		onkeydown={(e) => {
+			if (e.key === 'Enter' && onenter) {
+				console.log('Enter pressed');
+				onenter();
+			}
+		}}
+		oninput={(e) => {
+			if (onInputChange) {
+				onInputChange(e);
+			}
+		}}
 		{placeholder}
 		bind:value
 		bind:this={searchBarElement}

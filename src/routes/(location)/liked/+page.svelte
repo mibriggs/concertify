@@ -100,6 +100,10 @@
 			allArtists = initialState;
 		}
 	});
+
+	const handleSearch = async (searchValue: string) => {
+		console.log(searchValue);
+	};
 </script>
 
 {#if likedArtists.loading}
@@ -111,7 +115,7 @@
 		</div>
 	</ArtistGallery>
 {:else if likedArtists.ready}
-	<ArtistGallery label="Artists from Saved Tracks">
+	<ArtistGallery label="Artists from Saved Tracks" onsearch={handleSearch}>
 		<div class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4">
 			{#each allArtists as artist (artist.id)}
 				<ArtistCard

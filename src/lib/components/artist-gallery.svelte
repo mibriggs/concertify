@@ -9,13 +9,20 @@
 	interface Props {
 		label: string;
 		children?: Snippet;
+		onsearch?: (searchValue: string) => void;
+		onsearchcancelled?: () => void;
 	}
 
 	const filters = {
 		concerts: ['upcoming concerts']
 	};
 
-	let { label, children }: Props = $props();
+	let {
+		label,
+		children = undefined,
+		onsearch = undefined,
+		onsearchcancelled = undefined
+	}: Props = $props();
 
 	let badgeCount: number = $state(0);
 	let isFilterDropdownOpen: boolean = $state(false);
@@ -31,10 +38,11 @@
 			<div class="flex w-6/12 items-center gap-2">
 				<SearchBar
 					id="search"
-					placeholder="Search artists..."
+					placeholder="Enter to search artists..."
 					bind:value={searchValue}
 					onInputChange={() => console.log('input changed')}
-					onSearchCanceled={() => console.log('search cancelled')}
+					onSearchCanceled={() => onsearchcancelled?.()}
+					onenter={() => onsearch?.(searchValue)}
 				/>
 				<button
 					class={twJoin(
@@ -98,16 +106,19 @@
 			<div class="w-full">
 				<SearchBar
 					id="search-mobile"
-					placeholder="Search artists..."
+					placeholder="Enter to search artists..."
 					bind:value={searchValue}
 					onInputChange={() => console.log('input changed')}
-					onSearchCanceled={() => console.log('search cancelled')}
+					onSearchCanceled={() => onsearchcancelled?.()}
+					onenter={() => onsearch?.(searchValue)}
 				/>
 			</div>
 		</div>
 	</div>
 
-	{@render children?.()}
+	{#if children}
+		{@render children()}
+	{/if}
 </main>
 
 <style lang="postcss">

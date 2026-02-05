@@ -1,6 +1,11 @@
 import { getRequestEvent, query } from '$app/server';
 import { SECRET_TICKETMASTER_TOKEN } from '$env/static/private';
-import { constructQueryParams, TICKETMASTER_BASE_URL, getTicketmasterDateRange } from '$lib';
+import {
+	constructQueryParams,
+	TICKETMASTER_BASE_URL,
+	getTicketmasterDateRange,
+	normalizeName
+} from '$lib';
 import { concertEventSuccessSchema } from '$lib/types';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
@@ -191,13 +196,4 @@ function compareDates(a?: string, b?: string): number {
 	if (!a) return 1; // a goes after b
 	if (!b) return -1; // b goes after a
 	return a.localeCompare(b);
-}
-
-function normalizeName(name: string) {
-	return name
-		.toLowerCase()
-		.trim()
-		.normalize('NFD') // Decompose accented characters
-		.replace(/[\u0300-\u036f]/g, '') // Remove accent marks
-		.replace(/\s+/g, ' '); // Normalize whitespace
 }

@@ -102,6 +102,10 @@
 			allArtists = initialState;
 		}
 	});
+
+	const handleSearch = async (searchValue: string) => {
+		console.log(searchValue);
+	};
 </script>
 
 {#if !artistIds.ready || (artistIds.ready && allArtists.length === 0)}
@@ -113,7 +117,7 @@
 		</div>
 	</ArtistGallery>
 {:else if artistIds.ready && allArtists.length > 0}
-	<ArtistGallery label="Spotify's Top Artists">
+	<ArtistGallery label="Spotify's Top Artists" onsearch={handleSearch}>
 		<div class="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] justify-items-center gap-4">
 			{#each allArtists as artist (artist.id)}
 				<ArtistCard
