@@ -174,7 +174,9 @@ export const getConcertData = query(
 							attraction.externalLinks?.spotify?.find((sp) => sp.url.includes(artistId))?.url ?? '';
 						console.log(spotifyUrl);
 						const includesArtistId = spotifyUrl.includes(artistId);
-						return includesArtistId || normalizeName(attraction.name) === normalizeName(artistName);
+						return (
+							includesArtistId || normalizeName(attraction.name ?? '') === normalizeName(artistName)
+						);
 					});
 				})
 				.sort((event1, event2) =>

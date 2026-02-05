@@ -247,7 +247,7 @@ const concertEventSuccessSchema = z.object({
 							.array(),
 						attractions: z
 							.object({
-								name: z.string(),
+								name: z.string().optional(),
 								id: z.string().optional(),
 								type: z.string().optional(),
 								externalLinks: z
